@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Batam Explorer 3D | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#07121f;--c:#2dd4bf;--o:#fb923c;--t:#eaf6ff;--m:#8fa9bf}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--t);font:16px/1.55 Poppins,system-ui,sans-serif;background:radial-gradient(900px 500px at 50% 0,#0f3a56 0,transparent 65%),linear-gradient(#07121f,#0a1f33)}
+.bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 18px;background:#030a12;border-bottom:1px solid #ffffff1a}
+.bar a{color:var(--o);font-weight:700;text-decoration:none}.bar span{color:var(--m);font-size:.9rem}
+main{width:min(1000px,100% - 28px);margin:0 auto;padding:22px 0 50px}
+h1{font-size:clamp(1.8rem,5vw,2.8rem);font-weight:800;margin:0;line-height:1.1}h1 b{color:var(--c)}
+.sub{color:var(--m);margin:6px 0 16px}
+.tools{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:6px}
+.tools button,.tools input{font:inherit;color:var(--t);background:#ffffff12;border:1px solid #ffffff2a;border-radius:99px;padding:8px 16px;cursor:pointer}
+.tools button[aria-pressed=true]{background:var(--c);color:#04202a;border-color:var(--c);font-weight:700}
+.tools input{cursor:text;flex:1;min-width:160px}
+:focus-visible{outline:3px solid var(--o);outline-offset:2px}
+.ringwrap{perspective:1200px;height:380px;display:grid;place-items:center;overflow:hidden}
+.ring{position:relative;width:210px;height:290px;transform-style:preserve-3d;transition:transform .8s cubic-bezier(.2,.8,.2,1)}
+.pl{position:absolute;inset:0;border-radius:22px;background:linear-gradient(160deg,#16405f,#0b2338);border:1px solid #ffffff30;box-shadow:0 24px 40px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:14px;text-align:center;cursor:pointer;backface-visibility:hidden;color:inherit;font:inherit}
+.pl .e{font-size:3.6rem;filter:drop-shadow(0 10px 8px #0006)}.pl b{font-size:1rem}.pl small{color:var(--c)}
+.pl.on{border-color:var(--c);box-shadow:0 24px 50px #0009,0 0 40px #2dd4bf55}
+.detail{background:#ffffff0f;border:1px solid #ffffff22;border-radius:20px;padding:20px;display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap;backdrop-filter:blur(10px)}
+.detail h2{margin:0 0 4px}.detail p{margin:0;color:var(--m);max-width:56ch}
+.acts{display:flex;gap:10px;flex-wrap:wrap}
+.btn{font:inherit;font-weight:700;text-decoration:none;border:0;border-radius:99px;padding:10px 18px;cursor:pointer;background:var(--o);color:#2a1200}
+.btn.alt{background:#ffffff18;color:var(--t);border:1px solid #ffffff33}
+.nav{display:flex;justify-content:center;gap:12px;margin:8px 0 14px}
+.empty{text-align:center;color:var(--m);padding:60px 0}
+@media(prefers-reduced-motion:reduce){.ring{transition:none}}
+</style>
+</head>
+<body>
+<div class="bar"><a href="../../index.html#projects">&larr; Portofolio</a><span>Batam Explorer 3D: carousel tempat wisata, belanja, dan kuliner.</span></div>
+<main>
+<h1>Batam <b>Explorer</b></h1>
+<p class="sub">Putar carousel 3D, simpan favorit, dan buka lokasinya di Google Maps.</p>
+<div class="tools" id="cats" role="group" aria-label="Kategori"></div>
+<div class="tools"><input id="q" type="search" placeholder="Cari tempat" aria-label="Cari tempat"><button id="fav" aria-pressed="false">♥ Favorit saja</button></div>
+<div class="ringwrap"><div class="ring" id="ring"></div></div>
+<div class="nav"><button class="btn alt" id="pv" aria-label="Sebelumnya">&#9664;</button><button class="btn alt" id="nx" aria-label="Berikutnya">&#9654;</button></div>
+<div class="detail" id="detail"></div>
+<p class="empty" id="empty" hidden>Tidak ada tempat yang cocok.</p>
+</main>
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var P = [['Jembatan Barelang', 'Wisata', '🌉', 'Rangkaian jembatan yang menghubungkan Batam dengan pulau-pulau di sekitarnya. Cocok untuk berfoto dan menikmati pemandangan laut.'],
+    ['Masjid Raya Batam', 'Wisata', '🕌', 'Masjid besar di pusat kota dengan arsitektur megah. Terbuka untuk dikunjungi di luar waktu ibadah.'],
+    ['Vihara Duta Maitreya', 'Wisata', '🏯', 'Vihara besar dengan patung dan taman yang tertata. Pengunjung diharapkan berpakaian sopan.'],
+    ['Pantai Nongsa', 'Pantai', '🏖️', 'Pantai di sisi timur Batam yang dekat dengan area resor. Enak untuk menikmati sore hari.'],
+    ['Mega Mall Batam Centre', 'Belanja', '🛍️', 'Pusat perbelanjaan di kawasan Batam Centre dengan banyak pilihan toko dan tempat makan.'],
+    ['Nagoya Hill Mall', 'Belanja', '🏬', 'Mal besar di kawasan Nagoya, tempat nongkrong dan belanja favorit warga.'],
+    ['Gonggong', 'Kuliner', '🐚', 'Siput laut rebus khas Kepulauan Riau, biasanya disajikan dengan sambal.'],
+    ['Otak-otak', 'Kuliner', '🍢', 'Olahan ikan berbumbu yang dibakar dalam daun kelapa. Cocok jadi oleh-oleh.'],
+    ['Mie Lendir', 'Kuliner', '🍜', 'Mi dengan kuah kental berbumbu yang populer sebagai sarapan di Batam.']];
+  var cats = ['Semua', 'Wisata', 'Pantai', 'Belanja', 'Kuliner'], cat = 'Semua', fav = [], cur = 0, list = [];
+  try { fav = JSON.parse(localStorage.getItem('jh-batam-fav') || '[]'); } catch (e) {}
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  $('#cats').innerHTML = cats.map(function (c) { return '<button data-c="' + c + '" aria-pressed="' + (c === cat) + '">' + c + '</button>'; }).join('');
+  function render() {
+    var q = $('#q').value.toLowerCase(), fo = $('#fav').getAttribute('aria-pressed') === 'true';
+    list = P.filter(function (p) { return (cat === 'Semua' || p[1] === cat) && (p[0] + p[3]).toLowerCase().indexOf(q) >= 0 && (!fo || fav.indexOf(p[0]) >= 0); });
+    if (cur >= list.length) cur = 0;
+    var n = list.length, step = n ? 360 / n : 0, rad = Math.max(150, Math.round(105 / Math.tan(Math.PI / Math.max(n, 3))) + 60);
+    $('#ring').innerHTML = list.map(function (p, i) { return '<button class="pl' + (i === cur ? ' on' : '') + '" data-i="' + i + '" style="transform:rotateY(' + (i * step) + 'deg) translateZ(' + rad + 'px)"><span class="e">' + p[2] + '</span><b>' + esc(p[0]) + '</b><small>' + p[1] + '</small></button>'; }).join('');
+    $('#ring').dataset.step = step; $('#ring').dataset.rad = rad; spin();
+    $('#empty').hidden = n > 0; $('.ringwrap').hidden = !n; $('#detail').hidden = !n; $('.nav').hidden = !n; if (n) detail();
+  }
+  function spin() { var r = $('#ring'); r.style.transform = 'translateZ(-' + r.dataset.rad + 'px) rotateY(' + (-cur * r.dataset.step) + 'deg)'; $$('.pl').forEach(function (b, i) { b.classList.toggle('on', i === cur); }); }
+  function $$(s) { return Array.from(document.querySelectorAll(s)); }
+  function detail() {
+    var p = list[cur], f = fav.indexOf(p[0]) >= 0;
+    $('#detail').innerHTML = '<div><h2>' + p[2] + ' ' + esc(p[0]) + '</h2><p>' + esc(p[3]) + '</p></div><div class="acts"><a class="btn" target="_blank" rel="noopener" href="https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(p[0] + ' Batam') + '">Buka peta</a><button class="btn alt" id="sv" aria-pressed="' + f + '">' + (f ? '♥ Favorit' : '♡ Simpan') + '</button></div>';
+  }
+  function go(i) { if (!list.length) return; cur = (i + list.length) % list.length; spin(); detail(); }
+  document.addEventListener('click', function (e) {
+    var b = e.target.closest('button'); if (!b) return;
+    if (b.dataset.c) { cat = b.dataset.c; cur = 0; $$('#cats button').forEach(function (x) { x.setAttribute('aria-pressed', x === b); }); render(); }
+    else if (b.classList.contains('pl')) go(+b.dataset.i);
+    else if (b.id === 'pv') go(cur - 1); else if (b.id === 'nx') go(cur + 1);
+    else if (b.id === 'fav') { b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') !== 'true'); cur = 0; render(); }
+    else if (b.id === 'sv') { var n = list[cur][0], i = fav.indexOf(n); if (i < 0) fav.push(n); else fav.splice(i, 1); try { localStorage.setItem('jh-batam-fav', JSON.stringify(fav)); } catch (x) {} detail(); }
+  });
+  $('#q').addEventListener('input', function () { cur = 0; render(); });
+  document.addEventListener('keydown', function (e) { if (e.target.tagName === 'INPUT') return; if (e.key === 'ArrowRight') go(cur + 1); if (e.key === 'ArrowLeft') go(cur - 1); });
+  render();
+})();
+</script>
+</body>
+</html>

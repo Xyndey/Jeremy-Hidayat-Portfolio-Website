@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="night">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flappy Pixel | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_shared/shared.css">
+
+</head>
+<body data-title="Flappy Pixel">
+<main class="app">
+
+<h1>Flappy Pixel</h1>
+<section class="box" style="text-align:center">
+<p>Skor <b id="sc">0</b> &nbsp; Rekor <b id="bs">0</b></p>
+<canvas id="c" width="320" height="480" style="width:min(320px,100%);aspect-ratio:2/3;box-shadow:0 0 0 4px var(--gold);cursor:pointer" aria-label="Game Flappy Pixel" tabindex="0"></canvas>
+<p class="row" style="justify-content:center;margin-top:14px"><label class="muted">Kesulitan <select id="lvl" style="background:var(--bg);color:var(--text);border:0;padding:6px;font:inherit"><option value="150">Mudah</option><option value="130" selected>Normal</option><option value="112">Sulit</option></select></label><button class="btn btn-sm" id="snd" aria-pressed="false">Suara: mati</button><button class="btn btn-sm" id="pz">Jeda</button></p>
+<p class="muted">Spasi, klik, atau ketuk layar untuk melompat. Tekan P untuk jeda.</p>
+</section>
+</main>
+<script src="../_shared/shared.js"></script>
+<script>
+
+var GAP=load('jh-flappy-gap',130),snd=false,ac;function beep(f,d){if(!snd)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function medal(n){return n>=20?'Medali emas':n>=10?'Medali perak':n>=5?'Medali perunggu':''}
+var c=$('#c'),x=c.getContext('2d'),W=c.width,H=c.height,B=load('jh-flappy-best',0),bird,pipes,sc,st='ready',fr=0,raf;
+$('#bs').textContent=B;
+function reset(){bird={y:H/2,v:0};pipes=[];sc=0;fr=0;$('#sc').textContent=0}
+function flap(){if(st==='ready'){st='play';loopStart()}if(st==='play'){bird.v=-6.6;beep(520,.08)}else if(st==='over'){reset();st='ready';draw()}}
+function loopStart(){cancelAnimationFrame(raf);(function f(){update();draw();if(st==='play')raf=requestAnimationFrame(f)})()}
+function update(){fr++;bird.v+=.42;bird.y+=bird.v;if(fr%85===1)pipes.push({x:W,top:60+Math.random()*(H-260),p:false});
+  pipes.forEach(function(p){p.x-=2.2;if(!p.p&&p.x+44<60){p.p=true;sc++;$('#sc').textContent=sc}});pipes=pipes.filter(function(p){return p.x>-50});
+  var hit=bird.y<0||bird.y>H-40;pipes.forEach(function(p){if(60+14>p.x&&60-14<p.x+44&&(bird.y-14<p.top||bird.y+14>p.top+GAP))hit=true});
+  if(hit){st='over';beep(140,.35);if(sc>B){B=sc;save('jh-flappy-best',B);$('#bs').textContent=B}}}
+function draw(){x.fillStyle='#4cc9f0';x.fillRect(0,0,W,H);x.fillStyle='#fff';[[30,60],[200,110],[120,200]].forEach(function(q){x.fillRect(q[0],q[1],48,12);x.fillRect(q[0]+8,q[1]-8,24,8)});
+  pipes.forEach(function(p){x.fillStyle='#2e9e49';x.fillRect(p.x,0,44,p.top);x.fillRect(p.x,p.top+GAP,44,H);x.fillStyle='#5ad66f';x.fillRect(p.x-4,p.top-16,52,16);x.fillRect(p.x-4,p.top+GAP,52,16)});
+  x.fillStyle='#8b5a2b';x.fillRect(0,H-40,W,40);x.fillStyle='#5ad66f';x.fillRect(0,H-40,W,8);
+  var by=Math.round(bird.y);x.fillStyle='#000';x.fillRect(46,by-16,32,32);x.fillStyle='#ffc83d';x.fillRect(48,by-14,28,28);x.fillStyle='#fff';x.fillRect(62,by-10,10,10);x.fillStyle='#000';x.fillRect(67,by-6,4,4);x.fillStyle='#ff5d8f';x.fillRect(70,by+2,12,6);
+  x.font='16px "Press Start 2P",monospace';x.textAlign='center';x.fillStyle='#fff';
+  if(st==='ready'){x.fillText('Tekan untuk mulai',W/2,H/2-60)}
+  if(st==='over'){x.fillStyle='#000a';x.fillRect(0,H/2-50,W,100);x.fillStyle='#ffc83d';x.fillText('Game over',W/2,H/2-8);x.font='12px "Press Start 2P",monospace';x.fillStyle='#fff';x.fillText('Tekan untuk ulang',W/2,H/2+24);if(medal(sc)){x.fillStyle='#ffc83d';x.fillText(medal(sc),W/2,H/2+44)}}
+  if(st==='pause'){x.fillStyle='#000a';x.fillRect(0,H/2-30,W,60);x.fillStyle='#ffc83d';x.font='16px "Press Start 2P",monospace';x.fillText('Jeda',W/2,H/2+6)}}
+c.addEventListener('pointerdown',function(e){e.preventDefault();flap()});
+document.addEventListener('keydown',function(e){if(e.code==='Space'){e.preventDefault();flap()}});
+function pz(){if(st==='play'){st='pause';cancelAnimationFrame(raf);$('#pz').textContent='Lanjut';draw()}else if(st==='pause'){st='play';$('#pz').textContent='Jeda';loopStart()}}
+$('#pz').onclick=function(){pz();this.blur()};
+document.addEventListener('keydown',function(e){if(e.key==='p'||e.key==='P')pz()});
+$('#lvl').value=String(GAP);$('#lvl').onchange=function(){GAP=+this.value;save('jh-flappy-gap',GAP);this.blur();reset();st='ready';draw()};
+$('#snd').onclick=function(){snd=!snd;this.textContent='Suara: '+(snd?'nyala':'mati');this.setAttribute('aria-pressed',snd);this.blur()};
+reset();draw();
+</script>
+</body></html>

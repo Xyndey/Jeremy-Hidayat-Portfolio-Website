@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="night">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Habit Tracker | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_shared/shared.css">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1b1630">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+</head>
+<body data-title="Habit Tracker">
+<main class="app">
+
+<h1>Habit Tracker</h1>
+<section class="box"><form id="f" class="row"><input id="n" class="grow" placeholder="Kebiasaan baru, misalnya belajar 1 jam" maxlength="50" required aria-label="Kebiasaan baru"><button class="btn gold" type="submit">Tambah</button></form></section>
+<p id="sumh" class="muted" style="margin:0 0 12px"></p>
+<ul id="l"></ul>
+</main>
+<script src="../_shared/shared.js"></script>
+<script>
+
+var K='jh-habit',hs=load(K,[{n:'Belajar coding 1 jam',d:[]},{n:'Olahraga ringan',d:[]}]);
+function key(d){return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')}
+function back(n){var d=new Date();d.setDate(d.getDate()-n);return d}
+function streak(h){var i=h.d.indexOf(key(back(0)))>=0?0:1,s=0;while(h.d.indexOf(key(back(i)))>=0){s++;i++}return s}
+function best(h){var ds=h.d.slice().sort(),b=0,c=0,prev=null;ds.forEach(function(k){var t=new Date(k+'T00:00:00');if(prev&&Math.round((t-prev)/864e5)===1)c++;else c=1;if(c>b)b=c;prev=t});return b}
+function pct30(h){var n=0;for(var i=0;i<30;i++)if(h.d.indexOf(key(back(i)))>=0)n++;return Math.round(n*100/30)}
+function render(){var tk=key(back(0));var dn=hs.filter(function(h){return h.d.indexOf(tk)>=0}).length;$('#sumh').textContent=hs.length?'Hari ini: '+dn+' dari '+hs.length+' kebiasaan selesai'+(dn===hs.length?' 🎉':'')+'. Klik dua kali nama untuk mengganti.':'Belum ada kebiasaan. Tambahkan satu di atas.';
+  $('#l').innerHTML=hs.map(function(h,i){var done=h.d.indexOf(tk)>=0,st=streak(h);
+   var wk=[6,5,4,3,2,1,0].map(function(n){var d=back(n),on=h.d.indexOf(key(d))>=0;return '<span title="'+key(d)+'" style="display:inline-block;width:26px;height:26px;margin:2px;text-align:center;font-size:1rem;background:'+(on?'var(--green)':'var(--bg)')+';color:'+(on?'#1b1630':'var(--muted)')+'">'+d.toLocaleDateString('id-ID',{weekday:'narrow'})+'</span>'}).join('');
+   return '<li class="box"><div class="row" style="justify-content:space-between"><div><h2 style="margin:0 0 6px;color:var(--text)">'+esc(h.n)+'</h2><span class="chip">'+(st?'🔥 '+st+' hari beruntun':'Belum ada streak')+'</span> <span class="chip">Terbaik '+best(h)+' hari</span> <span class="chip">30 hari: '+pct30(h)+'%</span></div><div><button class="btn btn-sm'+(done?'':' gold')+'" data-t="'+i+'" aria-pressed="'+done+'">'+(done?'Batalkan hari ini':'Selesai hari ini')+'</button><button class="btn btn-sm pink" data-x="'+i+'" aria-label="Hapus '+esc(h.n)+'">&#10005;</button></div></div><div style="margin-top:10px">'+wk+'</div></li>'}).join('')||'<li class="muted">Belum ada kebiasaan. Tambahkan satu di atas.</li>';save(K,hs)}
+$('#f').addEventListener('submit',function(e){e.preventDefault();var v=$('#n').value.trim();if(v){hs.push({n:v,d:[]});$('#n').value='';render()}});
+$('#l').addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  if(b.dataset.t){var h=hs[+b.dataset.t],tk=key(back(0)),i=h.d.indexOf(tk);if(i<0){h.d.push(tk);toast('Mantap! Streak '+streak(h)+' hari')}else h.d.splice(i,1)}
+  if(b.dataset.x)hs.splice(+b.dataset.x,1);render()});
+$('#l').addEventListener('dblclick',function(e){var h2=e.target.closest('h2');if(!h2)return;var li=h2.closest('li'),i=Array.prototype.indexOf.call($('#l').children,li);var v=prompt('Ganti nama kebiasaan:',hs[i].n);if(v&&v.trim()){hs[i].n=v.trim().slice(0,50);render()}});
+render();
+if("serviceWorker"in navigator&&location.protocol.indexOf("http")===0){navigator.serviceWorker.register("sw.js").catch(function(){})}
+</script>
+</body></html>

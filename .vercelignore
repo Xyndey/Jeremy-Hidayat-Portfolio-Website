@@ -1,0 +1,6 @@
+extras
+projects/*/source
+projects/catur-3d/test-perft.js
+README.md
+.env
+.env.local

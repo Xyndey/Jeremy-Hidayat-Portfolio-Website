@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cuaca 3D | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;800&display=swap" rel="stylesheet">
+<style>
+:root{--sky1:#2563eb;--sky2:#60a5fa;--t:#fff}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--t);font:16px/1.5 Sora,system-ui,sans-serif;background:linear-gradient(var(--sky1),var(--sky2));transition:background 1s;overflow-x:hidden}
+body.night{--sky1:#0b1030;--sky2:#2a2f6e}
+body.rain{--sky1:#334155;--sky2:#64748b}
+.bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 18px;background:#0006;backdrop-filter:blur(8px);position:relative;z-index:5}
+.bar a{color:#fde68a;font-weight:700;text-decoration:none}.bar span{opacity:.8;font-size:.9rem}
+main{width:min(880px,100% - 28px);margin:0 auto;padding:20px 0 50px;position:relative;z-index:2}
+form{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+input{flex:1;min-width:180px;font:inherit;color:#fff;background:#ffffff22;border:1px solid #ffffff55;border-radius:14px;padding:12px 14px}
+input::placeholder{color:#ffffffbb}
+button{font:inherit;font-weight:600;color:#0b1030;background:#fde68a;border:0;border-radius:14px;padding:12px 18px;cursor:pointer}
+button.alt{background:#ffffff33;color:#fff;border:1px solid #ffffff55}
+:focus-visible{outline:3px solid #fde68a;outline-offset:2px}
+.hint{opacity:.85;font-size:.85rem;margin:0 0 14px}
+.scene{perspective:1100px;display:grid;place-items:center;min-height:420px}
+.stack{position:relative;width:min(560px,100%);height:380px;transform-style:preserve-3d;transition:transform .15s ease-out}
+.layer{position:absolute;transform-style:preserve-3d}
+.sun{width:170px;height:170px;border-radius:50%;right:6%;top:-10px;transform:translateZ(30px);background:radial-gradient(circle at 35% 30%,#fff7c2,#fcd34d 40%,#f59e0b 80%);box-shadow:0 0 80px #fbbf24aa,0 0 160px #f59e0b66}
+body.night .sun{background:radial-gradient(circle at 35% 30%,#fff,#e2e8f0 45%,#94a3b8 85%);box-shadow:0 0 60px #e2e8f088}
+.cloud{height:60px;border-radius:60px;background:#ffffffee;filter:drop-shadow(0 18px 14px #0003);animation:drift 14s ease-in-out infinite alternate}
+.cloud::before,.cloud::after{content:"";position:absolute;background:inherit;border-radius:50%}
+.cloud::before{width:64px;height:64px;left:20px;top:-30px}.cloud::after{width:84px;height:84px;right:22px;top:-42px}
+.c1{width:210px;left:2%;top:40px;transform:translateZ(90px)}.c2{width:160px;right:12%;top:120px;transform:translateZ(60px);animation-duration:18s;opacity:.9}
+body.night .cloud{background:#cbd5e1cc}body.rain .cloud{background:#cbd5e1}
+@keyframes drift{from{translate:-18px 0}to{translate:22px 0}}
+.drops{inset:0;transform:translateZ(110px);pointer-events:none;overflow:hidden;display:none}
+body.rain .drops{display:block}
+.drops i{position:absolute;top:-20px;width:2px;height:22px;background:linear-gradient(transparent,#bfdbfe);animation:fall .9s linear infinite}
+@keyframes fall{to{transform:translateY(420px)}}
+.card{left:50%;bottom:0;width:min(430px,92%);translate:-50% 0;padding:24px;border-radius:26px;background:#ffffff26;border:1px solid #ffffff66;backdrop-filter:blur(14px);box-shadow:0 40px 60px #0004;transform:translateZ(150px);text-align:center}
+.city{font-weight:600;letter-spacing:.04em;opacity:.95}
+.temp{font-size:5rem;font-weight:800;line-height:1;margin:6px 0;text-shadow:0 10px 24px #0004}
+.desc{font-size:1.2rem}.meta{opacity:.9;font-size:.92rem;margin-top:6px}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(132px,1fr));gap:16px;margin-top:20px;perspective:900px}
+.day{padding:16px 10px;text-align:center;border-radius:18px;background:#ffffff22;border:1px solid #ffffff55;backdrop-filter:blur(8px);transition:transform .15s ease-out;transform-style:preserve-3d}
+.day .e{font-size:2.2rem;filter:drop-shadow(0 8px 6px #0003)}
+.msg{text-align:center;padding:40px 0}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="bar"><a href="../../index.html#projects">&larr; Portofolio</a><span>Cuaca 3D: data dari API publik Open-Meteo, tampilan berlapis dengan efek kedalaman.</span></div>
+<main>
+<form id="f"><input id="q" value="Batam" placeholder="Nama kota" aria-label="Nama kota" list="hist" autocomplete="off"><datalist id="hist"></datalist><button type="submit">Cari</button><button type="button" class="alt" id="loc">Lokasi saya</button><button type="button" class="alt" id="u" aria-pressed="false">Ganti ke °F</button></form>
+<p class="hint">Gerakkan kursor di atas gambar untuk melihat efek 3D. Butuh koneksi internet.</p>
+<div class="scene" id="scene"><div class="stack" id="stack">
+  <div class="layer sun" aria-hidden="true"></div>
+  <div class="layer cloud c1" aria-hidden="true"></div><div class="layer cloud c2" aria-hidden="true"></div>
+  <div class="layer drops" id="drops" aria-hidden="true"></div>
+  <div class="layer card" id="now" aria-live="polite"><p class="msg">Memuat cuaca...</p></div>
+</div></div>
+<section class="days" id="days"></section>
+</main>
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); }, F = false, last = null;
+  var WC = { 0: ['☀️', 'Cerah'], 1: ['🌤️', 'Cerah berawan'], 2: ['⛅', 'Berawan sebagian'], 3: ['☁️', 'Berawan'], 45: ['🌫️', 'Berkabut'], 48: ['🌫️', 'Berkabut'], 51: ['🌦️', 'Gerimis'], 53: ['🌦️', 'Gerimis'], 55: ['🌦️', 'Gerimis lebat'], 61: ['🌧️', 'Hujan ringan'], 63: ['🌧️', 'Hujan'], 65: ['🌧️', 'Hujan lebat'], 80: ['🌦️', 'Hujan lokal'], 81: ['🌧️', 'Hujan lokal'], 82: ['⛈️', 'Hujan deras'], 95: ['⛈️', 'Badai petir'], 96: ['⛈️', 'Badai petir'], 99: ['⛈️', 'Badai petir'] };
+  function w(c) { return WC[c] || ['🌡️', 'Tidak diketahui']; }
+  function T(v) { return Math.round(F ? v * 9 / 5 + 32 : v) + '°' + (F ? 'F' : 'C'); }
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  (function () { var h = ''; for (var i = 0; i < 40; i++) h += '<i style="left:' + (i * 2.5 + Math.random() * 2) + '%;animation-delay:-' + (Math.random() * 0.9).toFixed(2) + 's;animation-duration:' + (0.6 + Math.random() * .5).toFixed(2) + 's"></i>'; $('#drops').innerHTML = h; })();
+  function show() {
+    if (!last) return; var cu = last.w.current, dy = last.w.daily, i = w(cu.weather_code);
+    document.body.classList.toggle('night', cu.is_day === 0); document.body.classList.toggle('rain', [51, 53, 55, 61, 63, 65, 80, 81, 82, 95, 96, 99].indexOf(cu.weather_code) >= 0);
+    $('#now').innerHTML = '<div class="city">' + esc(last.name) + (last.country ? ', ' + esc(last.country) : '') + '</div><div style="font-size:3rem">' + i[0] + '</div><div class="temp">' + T(cu.temperature_2m) + '</div><div class="desc">' + i[1] + '</div><div class="meta">Kelembapan ' + cu.relative_humidity_2m + '% · Angin ' + Math.round(cu.wind_speed_10m) + ' km/j</div>';
+    $('#days').innerHTML = dy.time.map(function (t, k) { var ic = w(dy.weather_code[k]); return '<div class="day"><div>' + new Date(t + 'T00:00').toLocaleDateString('id-ID', { weekday: 'short', day: 'numeric', month: 'short' }) + '</div><div class="e">' + ic[0] + '</div><div><b>' + T(dy.temperature_2m_max[k]) + '</b> / ' + T(dy.temperature_2m_min[k]) + '</div><div style="opacity:.85;font-size:.85rem">' + ic[1] + '</div></div>'; }).join('');
+  }
+  function fc(la, lo) { return 'https://api.open-meteo.com/v1/forecast?latitude=' + la + '&longitude=' + lo + '&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5'; }
+  var HK = 'jh-cuaca-hist', hist = []; try { hist = JSON.parse(localStorage.getItem(HK) || '[]'); } catch (e) {}
+  function paintHist() { $('#hist').innerHTML = hist.map(function (c) { return '<option value="' + esc(c) + '"></option>'; }).join(''); }
+  function addHist(c) { hist = [c].concat(hist.filter(function (x) { return x.toLowerCase() !== c.toLowerCase(); })).slice(0, 6); try { localStorage.setItem(HK, JSON.stringify(hist)); } catch (e) {} paintHist(); }
+  paintHist();
+  $('#loc').addEventListener('click', function () {
+    if (!navigator.geolocation) { $('#now').innerHTML = '<p class="msg">Peramban ini tidak mendukung lokasi.</p>'; return; }
+    $('#now').innerHTML = '<p class="msg">Mencari lokasimu...</p>';
+    navigator.geolocation.getCurrentPosition(async function (p) {
+      try { last = { name: 'Lokasi saya', country: '', w: await (await fetch(fc(p.coords.latitude.toFixed(3), p.coords.longitude.toFixed(3)))).json() }; show(); }
+      catch (e) { $('#now').innerHTML = '<p class="msg">Gagal memuat cuaca. Periksa koneksi internetmu.</p>'; }
+    }, function () { $('#now').innerHTML = '<p class="msg">Izin lokasi ditolak. Ketik nama kota saja.</p>'; }, { timeout: 10000 });
+  });
+  async function go(city) {
+    $('#now').innerHTML = '<p class="msg">Memuat cuaca...</p>';
+    try {
+      var g = await (await fetch('https://geocoding-api.open-meteo.com/v1/search?count=1&language=id&name=' + encodeURIComponent(city))).json();
+      if (!g.results || !g.results.length) { $('#now').innerHTML = '<p class="msg">Kota "' + esc(city) + '" tidak ditemukan. Coba ejaan lain.</p>'; $('#days').innerHTML = ''; return; }
+      var r = g.results[0], u = 'https://api.open-meteo.com/v1/forecast?latitude=' + r.latitude + '&longitude=' + r.longitude + '&current=temperature_2m,relative_humidity_2m,wind_speed_10m,weather_code,is_day&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5';
+      last = { name: r.name, country: r.country, w: await (await fetch(u)).json() }; show(); addHist(r.name);
+    } catch (e) { $('#now').innerHTML = '<p class="msg">Gagal memuat cuaca. Periksa koneksi internetmu lalu coba lagi.</p>'; $('#days').innerHTML = ''; }
+  }
+  $('#f').addEventListener('submit', function (e) { e.preventDefault(); var v = $('#q').value.trim(); if (v) go(v); });
+  $('#u').addEventListener('click', function () { F = !F; this.textContent = F ? 'Ganti ke °C' : 'Ganti ke °F'; this.setAttribute('aria-pressed', F); show(); });
+  var st = $('#stack'), sc = $('#scene');
+  sc.addEventListener('pointermove', function (e) { if (matchMedia('(prefers-reduced-motion: reduce)').matches) return; var r = sc.getBoundingClientRect(), x = (e.clientX - r.left) / r.width - .5, y = (e.clientY - r.top) / r.height - .5; st.style.transform = 'rotateX(' + (-y * 14) + 'deg) rotateY(' + (x * 22) + 'deg)'; });
+  sc.addEventListener('pointerleave', function () { st.style.transform = ''; });
+  go('Batam');
+})();
+</script>
+</body>
+</html>

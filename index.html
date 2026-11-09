@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="night">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Jeremy Hidayat | Portofolio Siswa RPL SMKN 7 Batam</title>
+  <meta name="description" content="Portofolio Jeremy Hidayat, siswa kelas XII RPL 2 SMK Negeri 7 Batam. Kumpulan proyek web, game, mobile, dan UI/UX.">
+  <meta name="theme-color" content="#1b1630">
+  <meta property="og:title" content="Jeremy Hidayat | Portofolio">
+  <meta property="og:description" content="Siswa RPL SMK Negeri 7 Batam. Lihat proyek web, game, dan UI/UX saya.">
+  <meta property="og:image" content="assets/profile.jpg">
+  <meta property="og:type" content="website">
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- Layar pembuka -->
+  <div id="loader" class="loader" role="dialog" aria-label="Layar pembuka">
+    <div class="loader__box pixel-box">
+      <img class="loader__avatar" src="assets/profile.jpg" alt="" width="96" height="96">
+      <h1 class="loader__title">Jeremy Hidayat</h1>
+      <p class="loader__sub">Portofolio v1.0</p>
+      <div class="bar" aria-hidden="true"><span id="loaderFill"></span></div>
+      <button id="startBtn" class="btn btn--gold blink-text" hidden>Tekan untuk mulai</button>
+    </div>
+  </div>
+
+  <!-- Latar bergerak -->
+  <div class="sky" aria-hidden="true">
+    <span class="cloud c1"></span><span class="cloud c2"></span><span class="cloud c3"></span>
+    <span class="star s1"></span><span class="star s2"></span><span class="star s3"></span><span class="star s4"></span><span class="star s5"></span>
+  </div>
+
+  <!-- Navigasi -->
+  <header class="hud" id="top">
+    <a class="hud__logo" href="#hero" aria-label="Beranda">
+      <svg width="28" height="28" viewBox="0 0 8 8" shape-rendering="crispEdges" aria-hidden="true"><path fill="#ff5d8f" d="M1 1h2v1h2V1h2v1h1v2H7v1H6v1H5v1H4v1H3V6H2V5H1V4H0V2h1z" transform="translate(0 -.5)"/></svg>
+      <span>JH</span>
+    </a>
+    <button class="hud__burger" id="burger" aria-label="Buka menu" aria-expanded="false" aria-controls="menu">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="hud__menu" id="menu" aria-label="Menu utama">
+      <a href="#about">Profil</a>
+      <a href="#skills">Skill</a>
+      <a href="#projects">Proyek</a>
+      <a href="#arcade">Arcade</a>
+      <a href="#journey">Perjalanan</a>
+      <a href="#pengalaman">Pengalaman</a>
+      <a href="#prestasi">Prestasi</a>
+      <a href="#awards">Lencana</a>
+      <a href="#contact">Kontak</a>
+    </nav>
+    <div class="hud__tools">
+      <button class="icon-btn" id="soundBtn" aria-pressed="false" title="Suara">🔇</button>
+      <button class="icon-btn" id="themeBtn" title="Ganti siang/malam">🌙</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero section" id="hero" data-section>
+      <div class="wrap hero__grid">
+        <div class="hero__text">
+          <p class="hero__player">Pemain 1</p>
+          <h2 class="hero__name">Jeremy<br>Hidayat</h2>
+          <p class="hero__role"><span id="typed"></span><span class="caret">_</span></p>
+          <p class="hero__lead">Siswa kelas XII RPL 2 di SMK Negeri 7 Batam. Saya membangun web, game piksel, dan antarmuka yang rapi.</p>
+          <p class="status"><span class="status__dot"></span> Sedang menjalani PKL</p>
+          <div class="hero__cta">
+            <a class="btn btn--gold" href="#projects" data-sfx>Lihat proyek</a>
+            <a class="btn" href="#contact" data-sfx>Hubungi saya</a>
+          </div>
+          <ul class="social" id="heroSocial" aria-label="Media sosial"></ul>
+        </div>
+
+        <aside class="card pixel-box" aria-label="Kartu karakter">
+          <div class="card__photo" id="photoWrap">
+            <img src="assets/profile.jpg" alt="Foto Jeremy Hidayat" id="photo" width="320" height="320">
+            <canvas id="photoPixel" aria-hidden="true"></canvas>
+            <span class="card__lv">LV XII</span>
+          </div>
+          <h3 class="card__name">Jeremy Hidayat</h3>
+          <p class="card__class">Kelas Rekayasa Perangkat Lunak</p>
+          <div class="meter"><label>HP</label><div class="bar bar--hp"><span style="width:100%"></span></div></div>
+          <div class="meter"><label>XP</label><div class="bar bar--xp"><span style="width:78%"></span></div></div>
+          <p class="card__hint">Arahkan kursor ke foto untuk melihat versi piksel.</p>
+        </aside>
+      </div>
+      <a class="scroll-cue" href="#about" aria-label="Gulir ke bawah">▼</a>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="section" id="about" data-section>
+      <div class="wrap">
+        <h2 class="title">Lembar karakter</h2>
+        <div class="about__grid">
+          <div class="pixel-box panel about__bio" id="bio"></div>
+          <dl class="pixel-box panel sheet" id="sheet"></dl>
+        </div>
+        <article class="pkl pixel-box panel" id="pkl" aria-label="Status PKL"></article>
+      </div>
+    </section>
+
+    <!-- SKILLS -->
+    <section class="section" id="skills" data-section>
+      <div class="wrap">
+        <h2 class="title">Atribut dan perlengkapan</h2>
+        <div class="skills__grid">
+          <div class="pixel-box panel">
+            <h3 class="sub">Atribut</h3>
+            <div id="stats"></div>
+          </div>
+          <div class="pixel-box panel">
+            <h3 class="sub">Inventaris teknologi</h3>
+            <ul class="inv" id="inventory"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PROJECTS -->
+    <section class="section" id="projects" data-section>
+      <div class="wrap">
+        <h2 class="title">Papan quest: proyek</h2>
+        <div class="tools">
+          <div class="filters" id="filters" role="tablist" aria-label="Filter kategori"></div>
+          <label class="search">
+            <span class="sr">Cari proyek</span>
+            <input id="search" type="search" placeholder="Cari proyek atau teknologi" autocomplete="off">
+          </label>
+        </div>
+        <p class="count" id="count" aria-live="polite"></p>
+        <div class="projects" id="projectGrid"></div>
+        <p class="empty" id="empty" hidden>Tidak ada proyek yang cocok. Coba kata kunci lain atau pilih kategori Semua.</p>
+      </div>
+    </section>
+
+    <!-- ARCADE -->
+    <section class="section" id="arcade" data-section>
+      <div class="wrap">
+        <h2 class="title">Arcade</h2>
+        <div class="arcade pixel-box panel">
+          <div class="arcade__info">
+            <h3 class="sub">Snake mini</h3>
+            <p>Makan apel, hindari dinding dan ekor sendiri. Pakai tombol panah atau WASD, atau tombol di layar.</p>
+            <p class="score">Skor <b id="score">0</b> &nbsp; Rekor <b id="best">0</b></p>
+            <button class="btn btn--gold" id="playBtn">Main</button>
+          </div>
+          <div class="arcade__screen">
+            <canvas id="snake" width="320" height="320" aria-label="Game Snake"></canvas>
+            <div class="dpad" aria-label="Tombol arah">
+              <button data-dir="up" aria-label="Atas">▲</button>
+              <button data-dir="left" aria-label="Kiri">◀</button>
+              <button data-dir="right" aria-label="Kanan">▶</button>
+              <button data-dir="down" aria-label="Bawah">▼</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- JOURNEY -->
+    <section class="section" id="journey" data-section>
+      <div class="wrap">
+        <h2 class="title">Peta perjalanan</h2>
+        <ol class="timeline" id="timeline"></ol>
+      </div>
+    </section>
+
+    <!-- PENGALAMAN -->
+    <section class="section" id="pengalaman" data-section>
+      <div class="wrap">
+        <h2 class="title">Pengalaman</h2>
+        <ul class="xp-list" id="xpList"></ul>
+      </div>
+    </section>
+
+    <!-- PRESTASI -->
+    <section class="section" id="prestasi" data-section>
+      <div class="wrap">
+        <h2 class="title">Prestasi</h2>
+        <ul class="pr-grid" id="prList"></ul>
+      </div>
+    </section>
+
+    <!-- ACHIEVEMENTS -->
+    <section class="section" id="awards" data-section>
+      <div class="wrap">
+        <h2 class="title">Lencana</h2>
+        <p class="lead">Buka lencana dengan menjelajahi website ini.</p>
+        <ul class="awards" id="awardList"></ul>
+      </div>
+    </section>
+
+    <!-- CONTACT -->
+    <section class="section" id="contact" data-section>
+      <div class="wrap">
+        <h2 class="title">Ajak bermain bareng</h2>
+        <div class="contact__grid">
+          <form class="pixel-box panel form" id="form" novalidate>
+            <label>Nama
+              <input name="nama" type="text" required autocomplete="name" placeholder="Nama kamu">
+            </label>
+            <label>Email atau nomor WhatsApp
+              <input name="kontak" type="text" required placeholder="Supaya saya bisa membalas">
+            </label>
+            <label>Pesan
+              <textarea name="pesan" rows="5" required placeholder="Tulis pesanmu di sini"></textarea>
+            </label>
+            <p class="form__err" id="formErr" role="alert" hidden></p>
+            <button class="btn btn--gold" type="submit">Kirim pesan</button>
+          </form>
+          <div class="pixel-box panel links">
+            <h3 class="sub">Temukan saya</h3>
+            <ul id="links"></ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap">
+      <p class="footer__big">Lanjutkan?</p>
+      <a class="btn" href="#top" data-sfx>Kembali ke awal</a>
+      <ul class="social social--foot" id="footSocial" aria-label="Media sosial"></ul>
+      <p class="footer__small">&copy; <span id="year"></span> Jeremy Hidayat. Dibuat dengan HTML, CSS, dan JavaScript.</p>
+    </div>
+  </footer>
+
+  <!-- Modal proyek -->
+  <div class="modal" id="modal" hidden>
+    <div class="modal__box pixel-box" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+      <button class="modal__close" id="mClose" aria-label="Tutup">✕</button>
+      <img class="modal__img" id="mImg" alt="" width="960" height="540">
+      <h3 id="mTitle"></h3>
+      <p id="mCat" class="chip"></p>
+      <p id="mDesc"></p>
+      <h4>Bahasa dan teknologi</h4>
+      <dl class="tech" id="mTech"></dl>
+      <h4>Fitur</h4>
+      <ul id="mFeat" class="feat"></ul>
+      <h4>Teknologi</h4>
+      <ul id="mStack" class="tags"></ul>
+      <div class="modal__cta">
+        <a class="btn btn--gold" id="mDemo" target="_blank" rel="noopener">Lihat demo</a>
+        <a class="btn" id="mRepo" target="_blank" rel="noopener">Kode di GitHub</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <button class="to-top" id="toTop" aria-label="Kembali ke atas" hidden>▲</button>
+
+  <script src="js/data.js"></script>
+  <script src="js/main.js"></script>
+</body>
+</html>

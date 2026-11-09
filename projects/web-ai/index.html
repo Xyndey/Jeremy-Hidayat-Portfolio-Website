@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>JerAI | Asisten AI</title>
+<meta name="description" content="JerAI: asisten AI bergaya ChatGPT. Pilih Claude, ChatGPT, Gemini, DeepSeek, Blackbox, atau Grok; setiap pesan selalu dijawab.">
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0f1d;--side:#0e1428;--card:#141b34;--line:#26335c;--ink:#e9eeff;--mute:#93a0c8;--violet:#8b5cf6;--cyan:#22d3ee;--rose:#fb7185;--ok:#34d399;--code:#060a18;--me:#2a2f6b}
+@media(prefers-color-scheme:light){:root{--bg:#f4f6ff;--side:#e9edff;--card:#fff;--line:#ccd4f5;--ink:#141a33;--mute:#56608a;--code:#101830;--me:#e0e4ff}}
+*{box-sizing:border-box}html,body{height:100%}
+body{margin:0;font-family:Sora,system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.6;display:flex;overflow:hidden}
+:focus-visible{outline:3px solid var(--cyan);outline-offset:2px}
+button{font:inherit;color:inherit;cursor:pointer}
+.side{width:268px;background:var(--side);border-right:1px solid var(--line);display:flex;flex-direction:column;padding:14px;gap:10px;flex:none}
+.side a.back{color:var(--cyan);text-decoration:none;font-weight:600;font-size:.85rem}
+.newc{border:1.5px dashed var(--line);background:transparent;border-radius:12px;padding:10px;font-weight:600}.newc:hover{border-color:var(--cyan)}
+.chats{flex:1;overflow:auto;display:grid;gap:4px;align-content:start}
+.ch{display:flex;align-items:center;gap:6px;border-radius:10px;padding:8px 10px;border:0;background:transparent;text-align:left;width:100%}.ch span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.88rem}.ch:hover,.ch.on{background:var(--card)}.ch .x{opacity:0;border:0;background:none;color:var(--mute);padding:0 4px}.ch:hover .x{opacity:1}
+.main{flex:1;display:flex;flex-direction:column;min-width:0;height:100dvh}
+.top{display:flex;align-items:center;gap:10px;padding:10px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.burger{display:none;border:1px solid var(--line);background:var(--card);border-radius:10px;padding:6px 10px}
+.logo{font-weight:800;font-size:1.2rem}.logo b{background:linear-gradient(90deg,var(--violet),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}
+.provs{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
+.prov{display:flex;align-items:center;gap:7px;padding:6px 11px;border-radius:99px;border:1.5px solid var(--line);background:var(--card);font-size:.82rem;font-weight:600}.prov[aria-pressed=true]{border-color:var(--cyan);box-shadow:0 0 0 3px #22d3ee33}.prov i{width:20px;height:20px;border-radius:7px;display:grid;place-items:center;font-style:normal;font-size:.68rem;color:#fff;font-weight:800}.prov .d{width:7px;height:7px;border-radius:50%;background:#6b7599}.prov .d.on{background:var(--ok)}
+.scroll{flex:1;overflow-y:auto;padding:20px 16px 8px;scroll-behavior:smooth}
+.col{width:min(780px,100%);margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.hello{text-align:center;padding:40px 10px}.hello h1{font-size:clamp(1.8rem,5vw,2.6rem);margin:0 0 6px;font-weight:800}.hello h1 b{background:linear-gradient(90deg,var(--violet),var(--cyan));-webkit-background-clip:text;background-clip:text;color:transparent}.hello p{color:var(--mute);margin:0 auto 22px;max-width:52ch}
+.sug{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}.sug button{border:1px solid var(--line);background:var(--card);border-radius:14px;padding:12px 14px;text-align:left;font-size:.88rem}.sug button:hover{border-color:var(--violet)}
+.row{display:flex;gap:12px}.row.me{justify-content:flex-end}
+.av{width:34px;height:34px;border-radius:11px;display:grid;place-items:center;color:#fff;font-weight:800;font-size:.78rem;flex:none}
+.bub{min-width:0;max-width:100%}.me .bub{background:var(--me);padding:10px 15px;border-radius:18px 18px 4px 18px;max-width:85%;white-space:pre-wrap;word-wrap:break-word}
+.bot .bub{flex:1}.who{font-size:.76rem;font-weight:800;letter-spacing:.04em;color:var(--mute);margin-bottom:4px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}.src{font-weight:600;letter-spacing:0;padding:1px 8px;border-radius:99px;background:var(--card);border:1px solid var(--line)}.src.live{color:var(--ok);border-color:var(--ok)}
+.md{word-wrap:break-word}.md p{margin:0 0 .8em}.md h1,.md h2,.md h3{margin:1em 0 .4em;line-height:1.3}.md h1{font-size:1.3rem}.md h2{font-size:1.15rem}.md h3{font-size:1.02rem}.md ul,.md ol{padding-left:1.3em;margin:0 0 .8em}.md li{margin:.15em 0}.md blockquote{margin:0 0 .8em;border-left:3px solid var(--violet);padding-left:12px;color:var(--mute)}.md a{color:var(--cyan)}
+.md code.i{background:#8b5cf633;padding:1px 6px;border-radius:6px;font-family:"JetBrains Mono",monospace;font-size:.88em}
+.cb{background:var(--code);border-radius:12px;margin:.6em 0 1em;overflow:hidden;border:1px solid var(--line)}.cb header{display:flex;justify-content:space-between;align-items:center;padding:6px 12px;background:#ffffff10;font:600 .74rem "JetBrains Mono",monospace;color:#a9b6e0}.cb header button{border:0;background:none;color:#a9b6e0;font-size:.74rem}.cb header button:hover{color:var(--cyan)}.cb pre{margin:0;padding:12px;overflow-x:auto;font:.84rem/1.55 "JetBrains Mono",monospace;color:#d6e2ff}
+.cursor::after{content:"▍";color:var(--cyan);animation:bl 1s steps(2) infinite}@keyframes bl{50%{opacity:0}}
+.dots span{display:inline-block;width:8px;height:8px;margin:0 3px;border-radius:50%;background:var(--cyan);animation:b 1s infinite}.dots span:nth-child(2){animation-delay:.15s}.dots span:nth-child(3){animation-delay:.3s}@keyframes b{50%{transform:translateY(-6px);opacity:.4}}
+.acts{display:flex;gap:4px;margin-top:6px}.acts button{border:0;background:none;color:var(--mute);font-size:.76rem;padding:3px 8px;border-radius:8px}.acts button:hover{color:var(--cyan);background:#22d3ee1a}
+.err{color:var(--rose)}
+.cmp{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;width:100%}.cmp .cell{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px}
+.dock{padding:8px 16px 14px}.box{width:min(780px,100%);margin:0 auto;background:var(--card);border:1.5px solid var(--line);border-radius:22px;padding:8px 8px 8px 16px;display:flex;gap:8px;align-items:flex-end}.box:focus-within{border-color:var(--violet)}
+textarea{flex:1;resize:none;max-height:180px;min-height:26px;font:inherit;color:var(--ink);background:transparent;border:0;padding:8px 0;outline:none}
+.send{border:0;border-radius:14px;width:44px;height:44px;color:#fff;background:linear-gradient(135deg,var(--violet),var(--cyan));font-size:1.1rem;font-weight:800}.send:disabled{opacity:.4}.send.stop{background:var(--rose)}
+.tools{width:min(780px,100%);margin:6px auto 0;display:flex;gap:8px;flex-wrap:wrap;font-size:.78rem;color:var(--mute);align-items:center}.tb{border:1px solid var(--line);background:transparent;border-radius:99px;padding:3px 11px;font-size:.76rem}.tb[aria-pressed=true]{background:var(--cyan);color:#06222b;border-color:var(--cyan)}.tb:disabled{opacity:.4;cursor:not-allowed}
+.note{width:min(780px,100%);margin:8px auto 0;text-align:center;font-size:.72rem;color:var(--mute)}
+@media(max-width:820px){.side{position:fixed;inset:0 auto 0 0;z-index:20;transform:translateX(-100%);transition:transform .2s}.side.open{transform:none;box-shadow:0 0 60px #000a}.burger{display:block}.provs{margin-left:0;width:100%}}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+.box{padding-left:8px}
+.atts{width:min(780px,100%);margin:0 auto 8px;display:flex;gap:8px;flex-wrap:wrap}.atts[hidden]{display:none}
+.chip{display:flex;align-items:center;gap:6px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:4px 8px;font-size:.78rem;max-width:230px}.chip img{width:34px;height:34px;object-fit:cover;border-radius:8px}.chip b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.chip button{border:0;background:none;color:var(--mute);font-size:1.1rem;line-height:1}.chip.pl{border-color:var(--violet)}
+.plus{position:relative}.ib{width:40px;height:40px;border-radius:14px;border:0;background:transparent;font-size:1.15rem;display:grid;place-items:center;color:var(--mute);flex:none}.ib:hover{background:#8b5cf622;color:var(--ink)}.ib[aria-pressed=true]{background:var(--rose);color:#fff;animation:pulse 1.2s infinite}
+.pop{position:absolute;bottom:48px;left:0;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:6px;display:grid;min-width:170px;box-shadow:0 12px 40px #0006;z-index:10}.pop[hidden]{display:none}.pop button{border:0;background:none;text-align:left;padding:9px 12px;border-radius:10px;font-size:.88rem}.pop button:hover{background:#8b5cf622}
+.ov{position:fixed;inset:0;background:#000a;display:grid;place-items:center;z-index:50;padding:16px}.ov[hidden]{display:none}.dlg{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;width:min(460px,100%);max-height:90dvh;overflow:auto}.dlg h2{margin:0 0 4px;font-size:1.1rem}.dlg p{margin:0;color:var(--mute);font-size:.85rem}.dlg video{width:100%;border-radius:12px;background:#000;max-height:60dvh;margin-top:10px}.row2{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}.pbtn{border:0;border-radius:12px;padding:9px 16px;font-weight:700;background:linear-gradient(135deg,var(--violet),var(--cyan));color:#fff}.gbtn{border:1px solid var(--line);background:transparent;border-radius:12px;padding:9px 16px}
+.pi{display:flex;gap:10px;align-items:flex-start;padding:10px;border:1px solid var(--line);border-radius:12px;margin-top:8px;cursor:pointer}.pi input{margin-top:5px;width:18px;height:18px}.pi b{display:block}.pi small{display:block;color:var(--mute)}
+.mat{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}.mat img{width:64px;height:64px;object-fit:cover;border-radius:10px}.fchip{font-size:.78rem;background:#ffffff22;padding:3px 8px;border-radius:8px}.mtag{margin-top:6px;font-size:.72rem;opacity:.8}
+.think{margin:2px 0 8px;border:1px dashed var(--line);border-radius:12px;padding:6px 12px;font-size:.88rem}.think summary{cursor:pointer;color:var(--mute);font-weight:600}.stg{margin-top:6px;font-size:.78rem;color:var(--mute)}
+#toast{min-height:1.2em;color:var(--cyan)}@keyframes pulse{50%{box-shadow:0 0 0 6px #fb718544}}
+</style>
+</head>
+<body>
+<aside class="side" id="side" aria-label="Riwayat percakapan"><a class="back" href="../../index.html#projects">&larr; Portofolio</a><button class="newc" id="newc">+ Percakapan baru</button><div class="chats" id="chats"></div></aside>
+<div class="main">
+  <div class="top"><button class="burger" id="burger" aria-label="Buka riwayat">&#9776;</button><span class="logo">Jer<b>AI</b></span><div class="provs" id="provs" role="group" aria-label="Pilih AI"></div></div>
+  <div class="scroll" id="scroll"><div class="col" id="log" role="log" aria-live="polite"></div></div>
+  <div class="dock">
+    <div class="atts" id="atts" aria-live="polite" hidden></div>
+    <form class="box" id="f">
+      <div class="plus"><button class="ib" id="plus" type="button" aria-label="Tambah lampiran atau plugin" aria-expanded="false" aria-haspopup="true">&#43;</button>
+        <div class="pop" id="pop" role="menu" hidden>
+          <button type="button" role="menuitem" data-a="cam">&#128247; Kamera</button><button type="button" role="menuitem" data-a="photo">&#128444;&#65039; Foto</button>
+          <button type="button" role="menuitem" data-a="file">&#128206; File</button><button type="button" role="menuitem" data-a="plug">&#129513; Plugin</button></div></div>
+      <textarea id="q" rows="1" maxlength="4000" placeholder="Kirim pesan ke JerAI…" aria-label="Pesan"></textarea>
+      <button class="ib" id="mic" type="button" aria-label="Mikrofon: bicara untuk mengetik" aria-pressed="false">&#127908;</button>
+      <button class="send" id="send" type="submit" aria-label="Kirim">&#10148;</button></form>
+    <input type="file" id="fPhoto" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden><input type="file" id="fCam" accept="image/*" capture="environment" hidden>
+    <input type="file" id="fFile" accept=".txt,.md,.csv,.json,.js,.ts,.html,.css,.py,.php,.java,.c,.cpp,.sql,.xml,.yml,.yaml,.log,text/*" multiple hidden>
+    <div class="tools"><span id="mode"></span><button class="tb" id="mG" aria-pressed="true">Umum</button><button class="tb" id="mP" aria-pressed="false">Tentang Jeremy</button><button class="tb" id="cmpb" aria-pressed="false" disabled title="Butuh minimal 2 API key aktif di server">Bandingkan semua</button><button class="tb" id="think" aria-pressed="false" title="Menjawab dalam dua tahap: menalar langkah demi langkah, lalu memeriksa ulang">&#129504; Think harder</button><button class="tb" id="dl">Unduh .txt</button></div>
+    <p class="note" id="toast" role="status" aria-live="polite"></p>
+    <p class="note" id="note"></p>
+  </div>
+</div>
+<div class="ov" id="plugov" hidden role="dialog" aria-modal="true" aria-labelledby="plugt"><div class="dlg"><h2 id="plugt">&#129513; Plugin</h2><p>Alat tambahan yang dijalankan di browser sebelum pesan dikirim. Hasilnya diberikan ke AI sebagai konteks.</p><div id="plugl"></div><div class="row2"><button class="pbtn" id="plugok" type="button">Selesai</button></div></div></div>
+<div class="ov" id="camov" hidden role="dialog" aria-modal="true" aria-labelledby="camt"><div class="dlg"><h2 id="camt">&#128247; Kamera</h2><p>Arahkan kamera lalu ambil foto. Foto hanya dikirim bila kamu menekan Kirim.</p><video id="vid" autoplay playsinline muted></video><div class="row2"><button class="pbtn" id="shot" type="button">Ambil foto</button><button class="gbtn" id="flip" type="button">Ganti kamera</button><button class="gbtn" id="camx" type="button">Tutup</button></div></div></div>
+<script src="../../js/data.js"></script>
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); }, P = window.PORTFOLIO || { projects: [], stats: [], inventory: [], profile: { bio: ['', ''] }, pkl: {}, config: {} }, C = P.config || {};
+  var PV = [
+    { id: 'claude', n: 'Claude', c: '#d97757', l: 'C', st: 'jelas, hangat, terstruktur, jujur soal batas pengetahuan' },
+    { id: 'openai', n: 'ChatGPT', c: '#10a37f', l: 'G', st: 'ramah, membantu, dengan ringkasan poin dan langkah praktis' },
+    { id: 'gemini', n: 'Gemini', c: '#4285f4', l: 'Ge', st: 'ringkas, seimbang, memakai judul kecil dan daftar' },
+    { id: 'deepseek', n: 'DeepSeek', c: '#4d6bfe', l: 'D', st: 'analitis, menalar langkah demi langkah, teknis' },
+    { id: 'blackbox', n: 'Blackbox', c: '#1f2937', l: 'B', st: 'fokus koding: berikan kode lengkap lebih dulu lalu penjelasan singkat' },
+    { id: 'grok', n: 'Grok', c: '#374151', l: 'X', st: 'langsung, santai, sedikit jenaka' }
+  ];
+  var KEY = 'jh-jerai-v3', st = { chats: [], cur: null }, prov = 'claude', mode = 'general', cmp = false, busy = false, avail = {}, abort = null, timer = null;
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  function pv(id) { return PV.filter(function (p) { return p.id === id; })[0] || { id: id, n: 'JerAI', c: '#64748b', l: 'J' }; }
+  function load() { try { var v = JSON.parse(localStorage.getItem(KEY) || 'null'); if (v && Array.isArray(v.chats)) st = v; } catch (e) { } }
+  function save() { try { st.chats = st.chats.slice(0, 30); localStorage.setItem(KEY, JSON.stringify(st, function (k, v) { return k === 'imgs' ? undefined : v; })); } catch (e) { } }
+  function chat() { var c = st.chats.filter(function (x) { return x.id === st.cur; })[0]; if (!c) { c = { id: 'c' + Date.now(), title: 'Percakapan baru', msgs: [] }; st.chats.unshift(c); st.cur = c.id; } return c; }
+
+  /* ---------- markdown ringan ---------- */
+  function inline(s) {
+    s = esc(s).replace(/`([^`\n]+)`/g, '<code class="i">$1</code>').replace(/\*\*([^*\n]+)\*\*/g, '<b>$1</b>').replace(/(^|[^*])\*([^*\n]+)\*/g, '$1<i>$2</i>').replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>');
+    return s;
+  }
+  function md(t) {
+    var parts = String(t).split(/```/), out = '';
+    parts.forEach(function (seg, i) {
+      if (i % 2) { var m = seg.match(/^([a-zA-Z0-9+#_-]*)\n?/), lang = m ? m[1] : '', code = seg.slice(m ? m[0].length : 0).replace(/\n$/, ''); out += '<div class="cb"><header><span>' + esc(lang || 'kode') + '</span><button type="button" data-copycode>Salin</button></header><pre><code>' + esc(code) + '</code></pre></div>'; return; }
+      var lines = seg.split('\n'), html = '', list = null, para = [];
+      function flushP() { if (para.length) { html += '<p>' + para.map(inline).join('<br>') + '</p>'; para = []; } }
+      function flushL() { if (list) { html += '</' + list + '>'; list = null; } }
+      lines.forEach(function (ln) {
+        var h = ln.match(/^(#{1,3})\s+(.*)/), ul = ln.match(/^\s*[-*•]\s+(.*)/), ol = ln.match(/^\s*\d+[.)]\s+(.*)/), q = ln.match(/^>\s?(.*)/);
+        if (h) { flushP(); flushL(); html += '<h' + h[1].length + '>' + inline(h[2]) + '</h' + h[1].length + '>'; }
+        else if (ul || ol) { flushP(); var tag = ul ? 'ul' : 'ol'; if (list !== tag) { flushL(); html += '<' + tag + '>'; list = tag; } html += '<li>' + inline((ul || ol)[1]) + '</li>'; }
+        else if (q) { flushP(); flushL(); html += '<blockquote>' + inline(q[1]) + '</blockquote>'; }
+        else if (!ln.trim()) { flushP(); flushL(); }
+        else { flushL(); para.push(ln); }
+      });
+      flushP(); flushL(); out += html;
+    });
+    return out;
+  }
+
+  /* ---------- mesin lokal (cadangan terakhir) ---------- */
+  function norm(s) { return s.toLowerCase().replace(/[^a-z0-9+\-*/().,% ]/g, ' '); }
+  function has(q, w) { return w.some(function (x) { return q.indexOf(x) >= 0; }); }
+  function calc(q) { var m = q.match(/(?:hitung|berapa)\s*([\d+\-*/().,%\s]+)/); if (!m) return null; var e = m[1].replace(/,/g, '.').replace(/%/g, '/100').trim(); if (!/^[\d+\-*/().\s]+$/.test(e) || !/\d/.test(e)) return null; try { var v = Function('"use strict";return (' + e + ')')(); return isFinite(v) ? 'Hasilnya **' + Math.round(v * 1e6) / 1e6 + '**.' : 'Hasilnya tidak terhingga.'; } catch (x) { return null; } }
+  var KB = [
+    [['html'], 'Contoh halaman HTML dasar:\n```html\n<!DOCTYPE html>\n<html lang="id">\n<head>\n  <meta charset="UTF-8">\n  <title>Halo</title>\n</head>\n<body>\n  <h1>Halo, dunia!</h1>\n  <p>Ini halaman pertamaku.</p>\n</body>\n</html>\n```\nSimpan sebagai `index.html` lalu buka di browser.'],
+    [['javascript', 'js '], 'Contoh fungsi JavaScript:\n```js\nfunction jumlah(a, b) {\n  return a + b;\n}\nconsole.log(jumlah(2, 3)); // 5\n```\nPakai `const`/`let`, fungsi panah `(a,b)=>a+b`, dan `fetch()` untuk memanggil API.'],
+    [['python'], 'Contoh Python:\n```python\nfor i in range(1, 6):\n    print(i * i)\n```\nPython memakai indentasi untuk blok kode. Daftar: `[1,2,3]`, kamus: `{"a":1}`.'],
+    [['php'], 'Contoh PHP:\n```php\n<?php\n$nama = "Budi";\necho "Halo, $nama!";\n```\nPHP berjalan di server; untuk database pakai PDO dengan prepared statement.'],
+    [['sql', 'mysql', 'database'], 'Contoh SQL:\n```sql\nSELECT nama, harga FROM produk WHERE harga > 10000 ORDER BY harga DESC;\n```\nGunakan prepared statement agar aman dari SQL injection.'],
+    [['css'], 'Contoh CSS flexbox:\n```css\n.row { display: flex; gap: 12px; align-items: center; }\n```\nUntuk tata letak dua dimensi pakai `display: grid`.'],
+    [['git', 'github'], 'Alur dasar Git:\n```bash\ngit init\ngit add .\ngit commit -m "pesan"\ngit branch -M main\ngit remote add origin URL\ngit push -u origin main\n```'],
+    [['vercel', 'deploy'], 'Deploy ke Vercel: unggah proyek ke GitHub, buka vercel.com/new, import repository, pilih Framework **Other** untuk situs statis, lalu klik Deploy.'],
+    [['motivasi', 'semangat', 'capek', 'malas'], 'Mulai dari langkah kecil: kerjakan **10 menit saja** hari ini. Konsistensi lebih penting daripada intensitas. Kamu sudah selangkah lebih maju dari kemarin. 💪'],
+    [['jokes', 'lelucon', 'candaan', 'lucu'], 'Kenapa programmer suka gelap? Karena *light attracts bugs*. 😄'],
+    [['belajar', 'tips belajar'], 'Tips belajar efektif:\n- Pakai teknik Pomodoro (25 menit fokus, 5 menit istirahat).\n- Jelaskan materi dengan kata-katamu sendiri.\n- Latih soal, jangan hanya membaca.\n- Tidur cukup supaya ingatan menetap.'],
+    [['ibukota indonesia', 'ibu kota indonesia'], 'Ibu kota Indonesia saat ini adalah **Jakarta**, sementara Ibu Kota Nusantara (IKN) di Kalimantan Timur sedang dibangun sebagai calon ibu kota baru.'],
+    [['rumus luas lingkaran', 'luas lingkaran'], 'Luas lingkaran = **π × r²**, dengan π ≈ 3,14 dan r jari-jari. Keliling = **2 × π × r**.'],
+    [['pythagoras', 'phytagoras'], 'Teorema Pythagoras: pada segitiga siku-siku, **a² + b² = c²**, dengan c sisi miring.']
+  ];
+  function projList() { return P.projects.map(function (p) { return '- ' + p.title; }).join('\n'); }
+  function findProject(q) { return P.projects.filter(function (p) { var t = p.title.toLowerCase(); return q.indexOf(t) >= 0 || t.split(' ').filter(function (w) { return w.length > 3; }).some(function (w) { return q.indexOf(w) >= 0; }); })[0]; }
+  function local(raw) {
+    var q = norm(raw), c = calc(q); if (c) return c;
+    if (has(q, ['jam berapa', 'pukul berapa'])) return 'Sekarang pukul **' + new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + '** (waktu perangkatmu).';
+    if (has(q, ['tanggal berapa', 'hari ini'])) return 'Hari ini **' + new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }) + '**.';
+    var pr = P.projects.length && findProject(q); if (mode === 'portfolio' || has(q, ['jeremy', 'portofolio', 'proyek', 'project', 'pkl', 'skill'])) {
+      if (has(q, ['pkl', 'magang'])) return 'Jeremy menjalani PKL di ' + (P.pkl.company || '-') + '. ' + (P.pkl.text || '');
+      if (has(q, ['kontak', 'hubungi', 'whatsapp', 'instagram', 'linkedin', 'github', 'email'])) return 'GitHub: ' + C.github + (C.instagram ? '\nInstagram: ' + C.instagram : '') + (C.linkedin ? '\nLinkedIn: ' + C.linkedin : '');
+      if (has(q, ['skill', 'keahlian', 'teknologi'])) return 'Skill Jeremy: ' + P.stats.map(function (s) { return s.name + ' (' + s.value + '/100)'; }).join(', ') + '.';
+      if (pr) return '**' + pr.title + '** (' + pr.cat + '). ' + pr.desc + '\n\nTeknologi: ' + pr.stack.join(', ') + '.';
+      if (has(q, ['proyek', 'project', 'karya', 'portofolio'])) return 'Jeremy punya ' + P.projects.length + ' proyek:\n' + projList();
+      if (has(q, ['siapa', 'tentang', 'profil'])) return P.profile.bio[0] + ' ' + P.profile.bio[1];
+    }
+    for (var i = 0; i < KB.length; i++) if (has(q, KB[i][0])) return KB[i][1];
+    if (has(q, ['halo', 'hai', 'hello', 'selamat'])) return 'Halo! Ada yang bisa kubantu? Tanyakan apa saja: belajar, kode, tulisan, atau hitungan.';
+    if (has(q, ['terima kasih', 'makasih', 'thanks'])) return 'Sama-sama! Kabari kalau ada yang ingin ditanyakan lagi.';
+    if (has(q, ['siapa kamu', 'kamu siapa'])) return 'Aku **JerAI**, asisten buatan Jeremy Hidayat. Aku bisa memakai beberapa model AI lewat server; saat server belum punya kunci API, aku memakai mode gratis atau mode lokal.';
+    return 'Maaf, saat ini semua layanan AI online tidak bisa dihubungi dan mode lokal-ku terbatas. Coba periksa koneksi internet lalu kirim ulang, atau tanyakan hal seperti kode HTML/JS/Python/SQL, tips belajar, hitungan (`hitung 12*(3+4)`), atau soal portofolio Jeremy.';
+  }
+
+  /* ---------- sumber jawaban ---------- */
+  function sys(p) { var base = mode === 'portfolio' ? 'Kamu JerAI, asisten di portofolio Jeremy Hidayat (siswa kelas XII RPL SMK Negeri 7 Batam, PKL di Oxyra Happy Hydration Era, GitHub Xyndey). Jangan mengarang fakta tentang Jeremy; jika tidak tahu, katakan.' : 'Kamu JerAI, asisten AI serbaguna.'; return base + ' Jawab dalam bahasa Indonesia kecuali diminta lain. Gunakan Markdown (judul kecil, daftar, blok kode). Gaya jawaban: ' + p.st + '. Jangan mengaku sebagai produk atau perusahaan AI tertentu.'; }
+  function histMsgs(c) {
+    var arr = c.msgs.filter(function (m) { return !m.group && !m.err && m.t; }).slice(-12);
+    return arr.map(function (m, i) { var last = i === arr.length - 1, content = m.t; if (m.r === 'me' && m.ctx) content += '\n\n' + m.ctx.slice(0, last ? 14000 : 2500); var o = { role: m.r === 'me' ? 'user' : 'assistant', content: content }; if (m.r === 'me' && last && m.imgs && m.imgs.length) o.images = m.imgs; return o; });
+  }
+  var THK = { '': '', draft: ' Pikirkan masalah ini langkah demi langkah secara mendalam. Tulis analisis singkat lalu jawabanmu.', final: ' Kamu sedang memeriksa ulang jawaban sebelumnya. Cari kesalahan, asumsi keliru, atau hal yang terlewat, lalu tulis JAWABAN FINAL yang sudah diperbaiki tanpa menyebut proses pemeriksaan.' };
+  function oa(msgs) { return msgs.map(function (m) { if (!m.images) return { role: m.role, content: m.content }; return { role: m.role, content: [{ type: 'text', text: m.content }].concat(m.images.map(function (u) { return { type: 'image_url', image_url: { url: u } }; })) }; }); }
+  function hasImg(msgs) { return msgs.some(function (m) { return m.images && m.images.length; }); }
+  async function viaServer(id, msgs, sig, think) {
+    var r = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ provider: id, mode: mode, think: think || '', messages: msgs }), signal: sig });
+    var j = await r.json().catch(function () { return {}; }); if (!r.ok) throw new Error(j.error || 'Server bermasalah'); return j.reply;
+  }
+  async function viaFree(id, msgs, sig, think) {
+    var ctl = new AbortController(), to = setTimeout(function () { ctl.abort(); }, 25000); sig && sig.addEventListener('abort', function () { ctl.abort(); });
+    try {
+      var r = await fetch('https://text.pollinations.ai/openai', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ model: 'openai', messages: [{ role: 'system', content: sys(pv(id)) + THK[think || ''] }].concat(oa(msgs)), private: true }), signal: ctl.signal });
+      if (!r.ok) throw new Error('free ' + r.status); var j = await r.json(); var t = j.choices && j.choices[0] && j.choices[0].message && j.choices[0].message.content; if (!t) throw new Error('kosong'); return t.trim();
+    } finally { clearTimeout(to); }
+  }
+  async function once(id, msgs, sig, think, text) {
+    if (avail[id]) { try { return { t: await viaServer(id, msgs, sig, think), src: 'live' }; } catch (e) { if (sig && sig.aborted) throw e; } }
+    try { return { t: await viaFree(id, msgs, sig, think), src: 'free' }; } catch (e) { if (sig && sig.aborted) throw e; }
+    return { t: local(text) + (hasImg(msgs) ? '\n\n> Mode lokal tidak bisa membaca gambar. Coba lagi saat koneksi AI tersedia.' : ''), src: 'local' };
+  }
+  function stage(t) { var d = document.querySelector('#log .row.bot .dots'); if (!d || !d.parentNode) return; var x = d.parentNode.querySelector('.stg'); if (!x) { x = document.createElement('div'); x.className = 'stg'; d.parentNode.appendChild(x); } x.textContent = t; }
+  async function answer(id, c, text, sig, opts) {
+    var msgs = histMsgs(c);
+    if (!(opts && opts.think)) return once(id, msgs, sig, '', text);
+    stage('Menyusun penalaran…'); var d = await once(id, msgs, sig, 'draft', text); if (d.src === 'local') return d;
+    stage('Memeriksa ulang jawaban…');
+    var f = await once(id, msgs.concat([{ role: 'assistant', content: d.t }, { role: 'user', content: 'Periksa ulang jawabanmu: cari kesalahan, asumsi keliru, atau hal yang terlewat. Tulis JAWABAN FINAL yang sudah diperbaiki.' }]), sig, 'final', text);
+    return { t: f.t, src: f.src, draft: d.t };
+  }
+  var SRC = { live: 'API resmi', free: 'mode gratis', local: 'mode lokal' };
+
+  /* ---------- tampilan ---------- */
+  function bubble(m, last) {
+    if (m.group) { return '<div class="cmp">' + m.group.map(function (x) { return '<div class="cell">' + botHtml(x, false) + '</div>'; }).join('') + '</div>'; }
+    if (m.r === 'me') return '<div class="row me"><div class="bub">' + (m.att && m.att.length ? '<div class="mat">' + m.att.map(function (a) { return a.kind === 'image' && a.thumb ? '<img src="' + a.thumb + '" alt="' + esc(a.name) + '">' : '<span class="fchip">&#128206; ' + esc(a.name) + '</span>'; }).join('') + '</div>' : '') + esc(m.t) + ((m.think || (m.tools && m.tools.length)) ? '<div class="mtag">' + (m.think ? '&#129504; Think harder ' : '') + (m.tools && m.tools.length ? '&#129513; ' + esc(m.tools.join(', ')) : '') + '</div>' : '') + '</div></div>';
+    return '<div class="row bot"><span class="av" style="background:' + pv(m.p).c + '">' + pv(m.p).l + '</span><div class="bub">' + botHtml(m, last) + '</div></div>';
+  }
+  function botHtml(m, last) { return '<div class="who">' + esc(pv(m.p).n) + (m.src ? '<span class="src ' + m.src + '" title="' + (m.src === 'live' ? 'Dijawab lewat API resmi di server' : m.src === 'free' ? 'Model gratis tanpa kunci API: bukan model asli ' + pv(m.p).n : 'Mesin lokal terbatas di browser') + '">' + SRC[m.src] + '</span>' : '') + '</div>' + (m.draft ? '<details class="think"><summary>&#129504; Lihat proses berpikir</summary><div class="md">' + md(m.draft) + '</div></details>' : '') + '<div class="md' + (m.err ? ' err' : '') + '" data-md>' + md(m.t) + '</div>' + (m.err ? '' : '<div class="acts"><button type="button" data-copy>Salin</button>' + (last ? '<button type="button" data-redo>Ulangi</button>' : '') + '</div>'); }
+  function hello() { return '<div class="hello"><h1>Halo, aku Jer<b>AI</b></h1><p>Tanyakan apa saja. Pilih Claude, ChatGPT, Gemini, DeepSeek, Blackbox, atau Grok di atas; setiap pesan akan selalu dijawab.</p><div class="sug">' + ['Jelaskan apa itu API dengan contoh sederhana', 'Buatkan kode HTML form login', 'Beri tips belajar efektif untuk ujian', 'Hitung 15% dari 240.000'].map(function (s) { return '<button type="button" data-sug="' + esc(s) + '">' + esc(s) + '</button>'; }).join('') + '</div></div>'; }
+  function paint(keep) {
+    var c = chat(), L = $('#log'); L.innerHTML = c.msgs.length ? c.msgs.map(function (m, i) { return bubble(m, i === c.msgs.length - 1); }).join('') : hello();
+    if (!keep) $('#scroll').scrollTop = 1e7; drawChats();
+  }
+  function drawChats() { $('#chats').innerHTML = st.chats.map(function (c) { return '<div class="ch' + (c.id === st.cur ? ' on' : '') + '" data-id="' + c.id + '" role="button" tabindex="0"><span>' + esc(c.title) + '</span><button class="x" data-del aria-label="Hapus percakapan">&times;</button></div>'; }).join(''); }
+  function drawProvs() {
+    $('#provs').innerHTML = PV.map(function (p) { return '<button type="button" class="prov" data-id="' + p.id + '" aria-pressed="' + (p.id === prov) + '" title="' + (avail[p.id] ? 'Terhubung lewat API resmi' : 'Tanpa kunci API: memakai mode gratis') + '"><i style="background:' + p.c + '">' + p.l + '</i>' + p.n + '<span class="d' + (avail[p.id] ? ' on' : '') + '"></span></button>'; }).join('');
+    var n = PV.filter(function (p) { return avail[p.id]; }).length; $('#cmpb').disabled = n < 2;
+    $('#mode').textContent = avail[prov] ? pv(prov).n + ' · API resmi' : pv(prov).n + ' · mode gratis';
+    $('#note').textContent = avail[prov] ? '' : 'Kunci API ' + pv(prov).n + ' belum diatur di server, jadi jawaban memakai model gratis bergaya ' + pv(prov).n + ' (bukan model asli). Isi Environment Variables di Vercel untuk memakai API resmi.';
+  }
+  function setBusy(b) { busy = b; var s = $('#send'); s.classList.toggle('stop', b); s.innerHTML = b ? '&#9632;' : '&#10148;'; s.setAttribute('aria-label', b ? 'Berhenti' : 'Kirim'); }
+
+  /* ---------- kirim ---------- */
+  function reveal(el, full, done) {
+    var i = 0, step = Math.max(2, Math.ceil(full.length / 220)); clearInterval(timer);
+    timer = setInterval(function () { i = Math.min(full.length, i + step); el.innerHTML = md(full.slice(0, i)); el.classList.toggle('cursor', i < full.length); $('#scroll').scrollTop = 1e7; if (i >= full.length) { clearInterval(timer); el.classList.remove('cursor'); done(); } }, 22);
+  }
+  async function send(text) {
+    if (busy) { if (abort) abort.abort(); clearInterval(timer); setBusy(false); finish(); return; }
+    var c = chat(); if (!text.trim()) { if (!att.length) return; text = 'Tolong analisis lampiran ini.'; }
+    var meta = att.map(function (a) { return { kind: a.kind, name: a.name, thumb: a.thumb }; }), imgs = att.filter(function (a) { return a.kind === 'image'; }).map(function (a) { return a.data; }), fctx = att.filter(function (a) { return a.kind === 'file'; }).map(function (a) { return '[Isi file: ' + a.name + ']\n```\n' + a.text + '\n```'; }).join('\n\n'), um = { r: 'me', t: text, att: meta, imgs: imgs, ctx: fctx, think: thinkOn, tools: [] };
+    att = []; drawAtts(); c.msgs.push(um); if (c.title === 'Percakapan baru') c.title = text.slice(0, 40); save(); paint(); setBusy(true);
+    abort = new AbortController(); var L = $('#log'), wait = document.createElement('div'); wait.className = 'row bot'; wait.innerHTML = '<span class="av" style="background:' + pv(prov).c + '">' + pv(prov).l + '</span><div class="bub"><div class="who">' + esc(pv(prov).n) + '</div><div class="dots"><span></span><span></span><span></span></div></div>'; L.appendChild(wait); $('#scroll').scrollTop = 1e7;
+    try {
+      var pr = await runPlugins(text); if (pr.ctx) { um.ctx = (um.ctx ? um.ctx + '\n\n' : '') + pr.ctx; um.tools = pr.used; save(); }
+      var opts = { think: um.think };
+      if (cmp && PV.filter(function (p) { return avail[p.id]; }).length > 1) {
+        var ids = PV.filter(function (p) { return avail[p.id]; }).map(function (p) { return p.id; }), res = await Promise.all(ids.map(function (id) { return answer(id, c, text, abort.signal, opts).then(function (a) { return { r: 'bot', p: id, t: a.t, src: a.src, draft: a.draft }; }, function () { return { r: 'bot', p: id, t: 'Gagal menjawab.', err: true }; }); }));
+        wait.remove(); c.msgs.push({ group: res }); save(); paint(); setBusy(false); return;
+      }
+      var a = await answer(prov, c, text, abort.signal, opts); wait.remove(); var m = { r: 'bot', p: prov, t: a.t, src: a.src, draft: a.draft }; c.msgs.push(m); save(); paint();
+      var el = $('#log').querySelector('.row.bot:last-child [data-md]'); if (el) { el.innerHTML = ''; reveal(el, m.t, function () { setBusy(false); paint(true); }); } else setBusy(false);
+    } catch (e) { wait.remove(); setBusy(false); if (!(abort && abort.signal.aborted)) { c.msgs.push({ r: 'bot', p: prov, t: 'Terjadi kesalahan. Coba lagi.', err: true }); save(); paint(); } }
+  }
+  function finish() { paint(); }
+  function lastUser() { var c = chat(); for (var i = c.msgs.length - 1; i >= 0; i--) if (c.msgs[i].r === 'me') return c.msgs[i].t; return ''; }
+  function redo() { if (busy) return; var c = chat(), t = lastUser(); if (!t) return; while (c.msgs.length && c.msgs[c.msgs.length - 1].r !== 'me') c.msgs.pop(); c.msgs.pop(); send(t); }
+
+  /* ---------- event ---------- */
+  var q = $('#q'); function grow() { q.style.height = 'auto'; q.style.height = Math.min(180, q.scrollHeight) + 'px'; }
+  q.addEventListener('input', grow); q.addEventListener('keydown', function (e) { if (e.key === 'Enter' && !e.shiftKey && !e.isComposing) { e.preventDefault(); $('#f').requestSubmit(); } });
+  $('#f').addEventListener('submit', function (e) { e.preventDefault(); if (busy) { send(''); return; } var v = q.value.trim(); if (!v && !att.length) return; if (listening && rec) rec.stop(); q.value = ''; grow(); send(v); });
+  $('#provs').addEventListener('click', function (e) { var b = e.target.closest('.prov'); if (!b) return; prov = b.dataset.id; drawProvs(); q.focus(); });
+  $('#mG').onclick = function () { mode = 'general'; $('#mG').setAttribute('aria-pressed', true); $('#mP').setAttribute('aria-pressed', false); };
+  $('#mP').onclick = function () { mode = 'portfolio'; $('#mP').setAttribute('aria-pressed', true); $('#mG').setAttribute('aria-pressed', false); };
+  $('#cmpb').onclick = function () { cmp = !cmp; this.setAttribute('aria-pressed', cmp); };
+  $('#newc').onclick = function () { if (busy) return; st.cur = null; chat(); save(); paint(); $('#side').classList.remove('open'); q.focus(); };
+  $('#burger').onclick = function () { $('#side').classList.toggle('open'); };
+  $('#chats').addEventListener('click', function (e) { var d = e.target.closest('.ch'); if (!d || busy) return; if (e.target.closest('[data-del]')) { st.chats = st.chats.filter(function (x) { return x.id !== d.dataset.id; }); if (st.cur === d.dataset.id) st.cur = null; chat(); save(); paint(); return; } st.cur = d.dataset.id; save(); paint(); $('#side').classList.remove('open'); });
+  $('#log').addEventListener('click', function (e) {
+    var t = e.target; if (t.closest('[data-sug]')) { send(t.closest('[data-sug]').dataset.sug); return; }
+    if (t.closest('[data-redo]')) { redo(); return; }
+    var cp = t.closest('[data-copy]'); if (cp) { var txt = cp.closest('.bub, .cell').querySelector('[data-md]').innerText; (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(function () { cp.textContent = 'Tersalin'; }, function () { cp.textContent = 'Gagal'; }); }
+    var cc = t.closest('[data-copycode]'); if (cc) { var code = cc.closest('.cb').querySelector('code').innerText; (navigator.clipboard ? navigator.clipboard.writeText(code) : Promise.reject()).then(function () { cc.textContent = 'Tersalin'; setTimeout(function () { cc.textContent = 'Salin'; }, 1500); }, function () { cc.textContent = 'Gagal'; }); }
+  });
+  $('#dl').onclick = function () { var rows = []; chat().msgs.forEach(function (m) { if (m.group) m.group.forEach(function (x) { rows.push('[' + pv(x.p).n + '] ' + x.t); }); else rows.push((m.r === 'me' ? 'Saya: ' : '[' + pv(m.p).n + '] ') + m.t); }); var a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([rows.join('\n\n')], { type: 'text/plain' })); a.download = 'percakapan-jerai.txt'; a.click(); };
+
+  /* ---------- lampiran, mikrofon, plugin, berpikir ---------- */
+  var att = [], plug = {}, thinkOn = false, MAXA = 4, stream = null, facing = 'environment', rec = null, listening = false, SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  try { plug = JSON.parse(localStorage.getItem('jh-jerai-plug') || '{}') || {}; } catch (e) { plug = {}; }
+  function toast(m) { var t = $('#toast'); t.textContent = m; clearTimeout(toast.h); toast.h = setTimeout(function () { t.textContent = ''; }, 6000); }
+  function drawAtts() {
+    var el = $('#atts');
+    el.innerHTML = att.map(function (a, i) { return '<span class="chip">' + (a.kind === 'image' ? '<img src="' + a.thumb + '" alt="">' : '&#128206;') + '<b>' + esc(a.name) + '</b><button type="button" data-rm="' + i + '" aria-label="Hapus lampiran ' + esc(a.name) + '">&times;</button></span>'; }).join('') +
+      Object.keys(PLUG).filter(function (k) { return plug[k]; }).map(function (k) { return '<span class="chip pl">&#129513; ' + esc(PLUG[k].n) + '</span>'; }).join('');
+    el.hidden = !el.innerHTML;
+  }
+  function shrink(src, w, h, max, q) { var s = Math.min(1, max / Math.max(w, h)), c = document.createElement('canvas'); c.width = Math.max(1, Math.round(w * s)); c.height = Math.max(1, Math.round(h * s)); var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(src, 0, 0, c.width, c.height); return c.toDataURL('image/jpeg', q); }
+  function readImage(f) {
+    return new Promise(function (res, rej) {
+      if (!/^image\/(png|jpe?g|webp|gif)$/i.test(f.type)) return rej(new Error('Format gambar tidak didukung. Pakai PNG, JPG, WEBP, atau GIF.'));
+      var fr = new FileReader(); fr.onerror = function () { rej(new Error('Gagal membaca gambar.')); };
+      fr.onload = function () { var im = new Image(); im.onerror = function () { rej(new Error('Gambar rusak.')); }; im.onload = function () { res({ kind: 'image', name: f.name || 'foto.jpg', data: shrink(im, im.width, im.height, 1280, .78), thumb: shrink(im, im.width, im.height, 96, .6) }); }; im.src = fr.result; };
+      fr.readAsDataURL(f);
+    });
+  }
+  var TXT = /\.(txt|md|csv|json|js|ts|html|css|py|php|java|c|cpp|sql|xml|ya?ml|log)$/i;
+  function readText(f) {
+    return new Promise(function (res, rej) {
+      if (f.size > 2 * 1024 * 1024) return rej(new Error('File terlalu besar (maksimal 2 MB).'));
+      if (!(TXT.test(f.name) || /^text\//.test(f.type))) return rej(new Error('Jenis file ini belum bisa dibaca. Gunakan file teks atau kode; untuk PDF/Word, kirim sebagai foto.'));
+      var fr = new FileReader(); fr.onerror = function () { rej(new Error('Gagal membaca file.')); };
+      fr.onload = function () { var t = String(fr.result); if (t.indexOf('\u0000') >= 0) return rej(new Error('File biner tidak didukung.')); res({ kind: 'file', name: f.name, text: t.slice(0, 12000) + (t.length > 12000 ? '\n…(dipotong, total ' + t.length + ' karakter)' : '') }); };
+      fr.readAsText(f);
+    });
+  }
+  async function addFiles(list, kind) {
+    for (var i = 0; i < list.length; i++) {
+      if (att.length >= MAXA) { toast('Maksimal ' + MAXA + ' lampiran per pesan.'); break; }
+      if (kind === 'image' && att.filter(function (a) { return a.kind === 'image'; }).length >= 3) { toast('Maksimal 3 gambar per pesan.'); break; }
+      try { att.push(kind === 'image' ? await readImage(list[i]) : await readText(list[i])); } catch (e) { toast(e.message); }
+    }
+    drawAtts();
+  }
+  [['#fPhoto', 'image'], ['#fCam', 'image'], ['#fFile', 'file']].forEach(function (p) { $(p[0]).addEventListener('change', function (e) { var l = Array.prototype.slice.call(e.target.files); e.target.value = ''; addFiles(l, p[1]); }); });
+  $('#atts').addEventListener('click', function (e) { var b = e.target.closest('[data-rm]'); if (!b) return; att.splice(+b.dataset.rm, 1); drawAtts(); });
+
+  /* menu + */
+  function popClose() { $('#pop').hidden = true; $('#plus').setAttribute('aria-expanded', 'false'); }
+  $('#plus').onclick = function (e) { e.stopPropagation(); var h = $('#pop').hidden; $('#pop').hidden = !h; this.setAttribute('aria-expanded', h); if (h) $('#pop button').focus(); };
+  document.addEventListener('click', function (e) { if (!e.target.closest('.plus')) popClose(); });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') { popClose(); closeCam(); $('#plugov').hidden = true; } });
+  $('#pop').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-a]'); if (!b) return; popClose(); var a = b.dataset.a;
+    if (a === 'cam') openCam(); else if (a === 'photo') $('#fPhoto').click(); else if (a === 'file') $('#fFile').click(); else if (a === 'plug') openPlug();
+  });
+
+  /* kamera */
+  async function openCam() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) { $('#fCam').click(); return; }
+    try { stopStream(); stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: facing }, audio: false }); $('#vid').srcObject = stream; $('#camov').hidden = false; $('#shot').focus(); }
+    catch (e) { toast('Kamera tidak bisa dibuka (' + (e.name === 'NotAllowedError' ? 'izin ditolak' : 'tidak tersedia') + '). Memakai pemilih foto.'); $('#fCam').click(); }
+  }
+  function stopStream() { if (stream) { stream.getTracks().forEach(function (t) { t.stop(); }); stream = null; } }
+  function closeCam() { stopStream(); $('#vid').srcObject = null; $('#camov').hidden = true; }
+  $('#camx').onclick = closeCam;
+  $('#flip').onclick = function () { facing = facing === 'environment' ? 'user' : 'environment'; openCam(); };
+  $('#shot').onclick = function () {
+    var v = $('#vid'); if (!v.videoWidth) { toast('Kamera belum siap.'); return; }
+    if (att.length >= MAXA) { toast('Maksimal ' + MAXA + ' lampiran per pesan.'); return; }
+    att.push({ kind: 'image', name: 'kamera-' + new Date().toISOString().slice(11, 19).replace(/:/g, '') + '.jpg', data: shrink(v, v.videoWidth, v.videoHeight, 1280, .78), thumb: shrink(v, v.videoWidth, v.videoHeight, 96, .6) });
+    drawAtts(); closeCam(); q.focus();
+  };
+
+  /* mikrofon (pengenalan suara bawaan browser) */
+  $('#mic').onclick = function () {
+    if (!SR) { toast('Peramban ini belum mendukung input suara. Coba Chrome, Edge, atau Safari terbaru.'); return; }
+    if (listening && rec) { rec.stop(); return; }
+    var btn = this, base = q.value ? q.value.trim() + ' ' : ''; rec = new SR(); rec.lang = 'id-ID'; rec.interimResults = true; rec.continuous = true;
+    rec.onstart = function () { listening = true; btn.setAttribute('aria-pressed', 'true'); toast('Mendengarkan… bicara sekarang. Tekan mikrofon lagi untuk berhenti.'); };
+    rec.onresult = function (e) { var t = ''; for (var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript; q.value = (base + t).slice(0, 4000); grow(); };
+    rec.onerror = function (e) { toast(e.error === 'not-allowed' || e.error === 'service-not-allowed' ? 'Izin mikrofon ditolak.' : e.error === 'no-speech' ? 'Tidak ada suara terdengar.' : 'Mikrofon bermasalah: ' + e.error); };
+    rec.onend = function () { listening = false; btn.setAttribute('aria-pressed', 'false'); q.focus(); };
+    try { rec.start(); } catch (e) { toast('Mikrofon tidak bisa dimulai.'); }
+  };
+
+  /* berpikir lebih keras */
+  $('#think').onclick = function () { thinkOn = !thinkOn; this.setAttribute('aria-pressed', thinkOn); toast(thinkOn ? 'Think harder aktif: jawaban dibuat dua tahap (menalar, lalu diperiksa ulang). Lebih lambat tapi lebih teliti.' : 'Think harder dimatikan.'); };
+
+  /* plugin */
+  function tmo(p, ms) { return Promise.race([p, new Promise(function (_, rj) { setTimeout(function () { rj(new Error('waktu habis')); }, ms); })]); }
+  function getJSON(u) { return fetch(u).then(function (r) { if (!r.ok) throw new Error('http ' + r.status); return r.json(); }); }
+  var PLUG = {
+    waktu: { n: 'Tanggal & waktu', d: 'Memberi tahu AI tanggal, jam, dan zona waktu kamu sekarang.', run: function () { return Promise.resolve('Waktu sekarang di perangkat pengguna: ' + new Date().toLocaleString('id-ID', { dateStyle: 'full', timeStyle: 'short' }) + ' (zona ' + Intl.DateTimeFormat().resolvedOptions().timeZone + ').'); } },
+    kalkulator: { n: 'Kalkulator', d: 'Menghitung ekspresi matematika di pesanmu secara akurat (angka dan + - * / ( ) % ^).', run: function (t) {
+      var m = t.replace(/,/g, '.').match(/\d[\d+\-*/().%^\s]*[\d)]/); if (!m) return Promise.resolve(null);
+      var e = m[0].replace(/\^/g, '**').replace(/(\d+(?:\.\d+)?)%/g, '($1/100)'); if (!/[+\-*/%]/.test(e) || !/^[\d+\-*/().\s*]+$/.test(e)) return Promise.resolve(null);
+      try { var v = Function('"use strict";return (' + e + ')')(); return Promise.resolve(isFinite(v) ? 'Hasil kalkulator untuk "' + m[0].trim() + '" = ' + Math.round(v * 1e8) / 1e8 : null); } catch (x) { return Promise.resolve(null); } } },
+    wikipedia: { n: 'Wikipedia', d: 'Mencari ringkasan artikel Wikipedia Indonesia yang relevan dengan pertanyaanmu.', run: function (t) {
+      var qq = t.replace(/[?!.]+$/, '').slice(0, 120);
+      return getJSON('https://id.wikipedia.org/w/api.php?action=query&list=search&srlimit=1&format=json&origin=*&srsearch=' + encodeURIComponent(qq)).then(function (j) {
+        var h = j.query && j.query.search && j.query.search[0]; if (!h) return null;
+        return getJSON('https://id.wikipedia.org/api/rest_v1/page/summary/' + encodeURIComponent(h.title.replace(/ /g, '_'))).then(function (s) { return s.extract ? 'Ringkasan Wikipedia "' + s.title + '": ' + s.extract + ' (Sumber: ' + ((s.content_urls && s.content_urls.desktop && s.content_urls.desktop.page) || 'id.wikipedia.org') + ')' : null; }); }); } },
+    cuaca: { n: 'Cuaca', d: 'Mengambil cuaca terkini di lokasimu (Open-Meteo) bila pesan menyinggung cuaca. Meminta izin lokasi.', run: function (t) {
+      if (!/cuaca|hujan|suhu|panas|dingin|angin|lembap|mendung/i.test(t) || !navigator.geolocation) return Promise.resolve(null);
+      return new Promise(function (res, rej) { navigator.geolocation.getCurrentPosition(res, rej, { timeout: 7000 }); }).then(function (p) {
+        return getJSON('https://api.open-meteo.com/v1/forecast?current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation&timezone=auto&latitude=' + p.coords.latitude.toFixed(2) + '&longitude=' + p.coords.longitude.toFixed(2)).then(function (j) { var c = j.current; return c ? 'Cuaca terkini di lokasi pengguna: suhu ' + c.temperature_2m + '°C, kelembapan ' + c.relative_humidity_2m + '%, angin ' + c.wind_speed_10m + ' km/j, curah hujan ' + c.precipitation + ' mm (sumber: Open-Meteo).' : null; }); }); } },
+    portofolio: { n: 'Data portofolio', d: 'Memberi AI daftar proyek dan skill Jeremy dari portofolio ini.', run: function () { return Promise.resolve('Data portofolio Jeremy Hidayat. Proyek: ' + P.projects.map(function (p) { return p.title; }).join('; ') + '. Skill: ' + P.stats.map(function (s) { return s.name + ' ' + s.value + '/100'; }).join(', ') + '.'); } }
+  };
+  async function runPlugins(text) {
+    var keys = Object.keys(PLUG).filter(function (k) { return plug[k]; }); if (!keys.length) return { ctx: '', used: [] };
+    stage('Menjalankan plugin…'); var out = [], used = [];
+    for (var i = 0; i < keys.length; i++) { try { var r = await tmo(PLUG[keys[i]].run(text), 8000); if (r) { out.push('[Plugin ' + PLUG[keys[i]].n + '] ' + r); used.push(PLUG[keys[i]].n); } } catch (e) { toast('Plugin ' + PLUG[keys[i]].n + ' gagal: ' + e.message); } }
+    return { ctx: out.length ? 'Konteks dari plugin (gunakan bila relevan, sebutkan sumbernya):\n' + out.join('\n') : '', used: used };
+  }
+  function openPlug() {
+    $('#plugl').innerHTML = Object.keys(PLUG).map(function (k) { return '<label class="pi"><input type="checkbox" data-pk="' + k + '"' + (plug[k] ? ' checked' : '') + '><span><b>' + esc(PLUG[k].n) + '</b><small>' + esc(PLUG[k].d) + '</small></span></label>'; }).join('');
+    $('#plugov').hidden = false; $('#plugok').focus();
+  }
+  $('#plugl').addEventListener('change', function (e) { var k = e.target.dataset.pk; if (!k) return; plug[k] = e.target.checked; try { localStorage.setItem('jh-jerai-plug', JSON.stringify(plug)); } catch (x) { } drawAtts(); });
+  $('#plugok').onclick = function () { $('#plugov').hidden = true; q.focus(); };
+  drawAtts();
+
+  load(); chat(); drawProvs(); paint();
+  fetch('/api/chat').then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) { Object.keys(j.providers || {}).forEach(function (k) { avail[k] = !!j.providers[k]; }); var first = PV.filter(function (p) { return avail[p.id]; })[0]; if (first) prov = first.id; drawProvs(); }).catch(function () { drawProvs(); });
+  window.__jerai = { md: md, local: local };
+})();
+</script>
+</body>
+</html>

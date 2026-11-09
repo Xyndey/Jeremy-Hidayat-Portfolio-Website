@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Catur 3D | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--bs:min(560px,86vw);--tilt:52deg;--rot:0deg;--gold:#e9c46a;--bg:#14101c;--panel:#1f1830;--line:#3a2f55;--text:#f3ecff;--mute:#a99dc4}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--text);font:16px/1.5 Inter,system-ui,sans-serif;background:radial-gradient(900px 600px at 50% 30%,#2b2147 0,var(--bg) 70%)}
+.bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 18px;background:#0d0a14;border-bottom:1px solid var(--line)}
+.bar a{color:var(--gold);font-weight:600;text-decoration:none}.bar span{color:var(--mute);font-size:.9rem}
+h1{font:700 clamp(1.4rem,4vw,2.2rem) Cinzel,serif;margin:18px 0 4px;text-align:center;letter-spacing:.06em}
+.sub{text-align:center;color:var(--mute);margin:0 0 6px}
+.layout{display:grid;grid-template-columns:1fr 300px;gap:24px;width:min(1100px,100% - 28px);margin:0 auto 40px;align-items:start}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+.scene{perspective:1300px;min-height:calc(var(--bs) * .98);display:grid;place-items:center;padding:30px 0 50px;touch-action:pan-y;user-select:none}
+.board{width:var(--bs);aspect-ratio:1;display:grid;grid-template-columns:repeat(8,1fr);grid-template-rows:repeat(8,1fr);position:relative;transform-style:preserve-3d;transform:rotateX(var(--tilt)) rotateZ(var(--rot));transition:transform .6s cubic-bezier(.2,.8,.2,1);border:0}
+.board::before{content:"";position:absolute;inset:-16px;background:linear-gradient(135deg,#6b4429,#3b2616);border-radius:14px;transform:translateZ(-10px);box-shadow:0 50px 70px #000a,0 0 0 2px #2a1a0e;pointer-events:none}
+.board::after{content:"";position:absolute;inset:-16px;border-radius:14px;transform:translateZ(-9px);box-shadow:inset 0 0 0 6px #4e3220,inset 0 0 0 7px #8a5f3a;pointer-events:none}
+.sq{position:relative;border:0;padding:0;margin:0;transform-style:preserve-3d;transform:translateZ(1px);cursor:pointer;font:inherit;color:inherit}
+.sq.l{background:#ecd9b6}.sq.d{background:#a8744c}
+.sq:focus-visible{outline:3px solid var(--gold);outline-offset:-3px;z-index:3}
+.sq.sel{background:#f2c94c!important}
+.sq.last::before{content:"";position:absolute;inset:0;background:#f2e46066}
+.sq.chk{background:radial-gradient(circle,#ff4d4d 0,#ff4d4d80 45%,transparent 75%),#a8744c}
+.sq.tgt::after{content:"";position:absolute;left:35%;top:35%;width:30%;height:30%;border-radius:50%;background:#2ecc7199;box-shadow:0 0 0 3px #2ecc7144;z-index:1}
+.sq.tgt.has::after{left:6%;top:6%;width:88%;height:88%;background:transparent;border:5px solid #ff6b6bcc;box-shadow:none}
+.sq.has:not(.tgt)::after{content:"";position:absolute;left:18%;right:18%;bottom:6%;height:16%;border-radius:50%;background:#0006;filter:blur(2px)}
+.coord{position:absolute;font-size:calc(var(--bs)/8*.17);font-weight:600;opacity:.65;pointer-events:none;transform:rotateZ(calc(var(--rot) * -1))}
+.coord.f{right:4%;bottom:2%}.coord.r{left:5%;top:3%}
+.pc{position:absolute;left:-10%;right:-10%;bottom:7%;text-align:center;font:400 calc(var(--bs)/8*.9)/1 "Segoe UI Symbol","DejaVu Sans","Noto Sans Symbols 2","Arial Unicode MS",sans-serif;pointer-events:none;transform-origin:50% 100%;transform:rotateZ(calc(var(--rot) * -1)) rotateX(calc(var(--tilt) * -1));transition:transform .6s cubic-bezier(.2,.8,.2,1);z-index:2}
+.pc.w{color:#fbf6ea;-webkit-text-stroke:1.4px #4a3a26;text-shadow:0 2px 0 #cdbd9f,0 4px 0 #b5a584,0 6px 0 #9d8d6e,0 10px 10px #0007}
+.pc.b{color:#2e2638;-webkit-text-stroke:1.4px #000;text-shadow:0 2px 0 #1a1522,0 4px 0 #120e19,0 6px 0 #0a0710,0 10px 10px #0009}
+.pc.land{animation:drop .38s cubic-bezier(.3,1.5,.5,1)}
+@keyframes drop{from{translate:0 -34px;opacity:.2}to{translate:0 0;opacity:1}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 20px 40px #0006}
+.status{font:600 1.05rem Cinzel,serif;min-height:3em;margin:0 0 14px}
+.status.bad{color:#ff8f8f}.status.good{color:#7ee2a8}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;align-items:center}
+button.b,select{font:inherit;font-weight:600;color:var(--text);background:#2d2347;border:1px solid var(--line);border-radius:10px;padding:8px 12px;cursor:pointer}
+button.b:hover,select:hover{border-color:var(--gold)}button.b.gold{background:var(--gold);color:#241a08;border-color:var(--gold)}
+label{display:flex;gap:8px;align-items:center;color:var(--mute);font-size:.92rem;width:100%}
+input[type=range]{flex:1;accent-color:var(--gold)}
+.cap{min-height:1.8em;font:1.5rem/1.2 "Segoe UI Symbol","DejaVu Sans",sans-serif;letter-spacing:2px;color:#d9cfee}
+.moves{max-height:180px;overflow:auto;font-size:.92rem;color:var(--mute);display:grid;grid-template-columns:34px 1fr 1fr;gap:2px 8px;margin-top:8px}
+.moves b{color:var(--text)}
+h2{font:700 .8rem Cinzel,serif;letter-spacing:.14em;color:var(--gold);margin:14px 0 6px;text-transform:uppercase}
+@media(prefers-reduced-motion:reduce){.board,.pc{transition:none}.pc.land{animation:none}}
+html,body{overflow-x:hidden}</style>
+</head>
+<body>
+<div class="bar"><a href="../../index.html#projects">&larr; Portofolio</a><span>Catur 3D: papan 3D murni CSS, aturan lengkap, dan lawan komputer.</span></div>
+<h1>Catur 3D</h1>
+<p class="sub">Klik bidak untuk melihat langkah legal. Seret area kosong untuk memutar kamera.</p>
+<div class="layout">
+  <div class="scene" id="scene"><div class="board" id="board" role="grid" aria-label="Papan catur"></div></div>
+  <aside class="panel">
+    <p class="status" id="status" aria-live="polite"></p>
+    <div class="row"><button class="b gold" id="new">Permainan baru</button><button class="b" id="undo">Urungkan</button></div>
+    <div class="row"><label>Kamu main sebagai <select id="side"><option value="w">Putih</option><option value="b">Hitam</option></select></label>
+      <label>Tingkat lawan <select id="lvl"><option value="0">Pemula (acak)</option><option value="1">Mudah</option><option value="2" selected>Sedang</option><option value="3">Sulit</option></select></label></div>
+    <h2>Kamera</h2>
+    <div class="row"><button class="b" id="rl" aria-label="Putar ke kiri">&#9664;</button><button class="b" id="rr" aria-label="Putar ke kanan">&#9654;</button><button class="b" id="flat">2D / 3D</button></div>
+    <label>Kemiringan <input type="range" id="tilt" min="0" max="70" value="52"></label>
+    <h2>Bidak ditangkap</h2><div class="cap" id="capW" aria-label="Bidak putih yang ditangkap"></div><div class="cap" id="capB" aria-label="Bidak hitam yang ditangkap"></div>
+    <h2>Langkah</h2><div class="moves" id="moves"></div>
+    <p style="color:var(--mute);font-size:.82rem;margin:12px 0 0">Aturan diuji dengan perft (rokade, en passant, promosi otomatis menjadi Menteri). Seri karena pengulangan langkah belum didukung.</p>
+  </aside>
+</div>
+<script src="engine.js"></script>
+<script>
+(function () {
+  var $ = function (s) { return document.querySelector(s); };
+  var G = { '♔': 1 };
+  var GL = { K: '♚', Q: '♛', R: '♜', B: '♝', N: '♞', P: '♟' }, VS = '\uFE0E';
+  var NAME = { K: 'Raja', Q: 'Menteri', R: 'Benteng', B: 'Gajah', N: 'Kuda', P: 'Pion' };
+  var game, hist, human = 'w', depth = 2, sel = -1, targets = [], last = null, busy = false, over = false, camRot = 0, tilt = 52, landSq = -1;
+  var boardEl = $('#board'), sqs = [];
+
+  function build() {
+    boardEl.innerHTML = ''; sqs = [];
+    for (var i = 0; i < 64; i++) {
+      var r = i >> 3, c = i & 7, b = document.createElement('div');
+      b.className = 'sq ' + ((r + c) % 2 ? 'd' : 'l'); b.dataset.i = i; b.tabIndex = 0; b.setAttribute('role', 'gridcell');
+      if (c === 0) b.insertAdjacentHTML('beforeend', '<span class="coord r">' + (8 - r) + '</span>');
+      if (r === 7) b.insertAdjacentHTML('beforeend', '<span class="coord f">' + 'abcdefgh'[c] + '</span>');
+      boardEl.appendChild(b); sqs.push(b);
+    }
+  }
+  function name(i) { return 'abcdefgh'[i & 7] + (8 - (i >> 3)); }
+  function render() {
+    var st = Chess.status(game), kingSq = -1;
+    if (st === 'check' || st === 'mate') kingSq = game.b.indexOf(game.turn === 'w' ? 'K' : 'k');
+    for (var i = 0; i < 64; i++) {
+      var el = sqs[i], p = game.b[i], cls = 'sq ' + (((i >> 3) + (i & 7)) % 2 ? 'd' : 'l');
+      if (i === sel) cls += ' sel'; if (last && (i === last.from || i === last.to)) cls += ' last';
+      if (i === kingSq) cls += ' chk'; if (targets.indexOf(i) >= 0) cls += ' tgt'; if (p !== '.') cls += ' has';
+      el.className = cls;
+      var old = el.querySelector('.pc'); if (old) old.remove();
+      if (p !== '.') {
+        var pc = document.createElement('span'), w = p === p.toUpperCase();
+        pc.className = 'pc ' + (w ? 'w' : 'b') + (i === landSq ? ' land' : ''); pc.textContent = GL[p.toUpperCase()] + VS; el.appendChild(pc);
+      }
+      el.setAttribute('aria-label', name(i) + (p !== '.' ? ', ' + NAME[p.toUpperCase()] + ' ' + (p === p.toUpperCase() ? 'putih' : 'hitam') : ', kosong'));
+    }
+    landSq = -1;
+    var msg = '', cl = '';
+    if (st === 'mate') { var win = game.turn === 'w' ? 'b' : 'w'; msg = 'Skakmat! ' + (win === human ? 'Kamu menang.' : 'Komputer menang.'); cl = win === human ? 'good' : 'bad'; over = true; }
+    else if (st === 'stalemate') { msg = 'Seri: pat (tidak ada langkah legal).'; over = true; }
+    else if (st === 'draw50') { msg = 'Seri: aturan 50 langkah.'; over = true; }
+    else if (st === 'material') { msg = 'Seri: materi tidak cukup.'; over = true; }
+    else { over = false; msg = busy ? 'Komputer berpikir...' : (game.turn === human ? 'Giliranmu (' + (human === 'w' ? 'Putih' : 'Hitam') + ').' : 'Giliran komputer.'); if (st === 'check') { msg = 'Skak! ' + msg; cl = 'bad'; } }
+    var s = $('#status'); s.textContent = msg; s.className = 'status ' + cl;
+    // bidak ditangkap
+    var cnt = { P: 8, N: 2, B: 2, R: 2, Q: 1, K: 1 }, w = Object.assign({}, cnt), bl = Object.assign({}, cnt);
+    game.b.forEach(function (p) { if (p === '.') return; if (p === p.toUpperCase()) w[p]--; else bl[p.toUpperCase()]--; });
+    function lost(o, c) { return 'QRBNP'.split('').map(function (k) { return Math.max(0, o[k]) > 0 ? (GL[k] + VS).repeat(Math.max(0, o[k])) : ''; }).join(''); }
+    $('#capW').textContent = lost(w); $('#capW').style.color = '#fbf6ea'; $('#capB').textContent = lost(bl); $('#capB').style.color = '#8e82a8';
+    var mv = $('#moves'); mv.innerHTML = '';
+    for (var k = 0; k < hist.length; k += 2) mv.insertAdjacentHTML('beforeend', '<b>' + (k / 2 + 1) + '.</b><span>' + hist[k].san + '</span><span>' + (hist[k + 1] ? hist[k + 1].san : '') + '</span>');
+    mv.scrollTop = mv.scrollHeight;
+  }
+  function san(s, m) {
+    var p = s.b[m.from].toUpperCase();
+    if (m.flag === 'castle') return m.to > m.from ? 'O-O' : 'O-O-O';
+    var cap = s.b[m.to] !== '.' || m.flag === 'ep';
+    return (p === 'P' ? '' : p) + name(m.from) + (cap ? 'x' : '-') + name(m.to) + (m.promo ? '=' + m.promo : '');
+  }
+  function apply(m) {
+    var text = san(game, m); hist.push({ state: game, san: text, last: last });
+    game = Chess.make(game, m); last = { from: m.from, to: m.to }; landSq = m.to; sel = -1; targets = [];
+  }
+  function aiMove() {
+    if (over || game.turn === human) return;
+    busy = true; render();
+    setTimeout(function () {
+      var m = Chess.bestMove(game, depth); busy = false;
+      if (m) apply(m); render();
+    }, 320);
+  }
+  boardEl.addEventListener('click', function (e) {
+    var b = e.target.closest('.sq'); if (!b || busy || over || game.turn !== human) return;
+    var i = +b.dataset.i, p = game.b[i];
+    if (sel >= 0 && targets.indexOf(i) >= 0) {
+      var ms = Chess.legal(game).filter(function (m) { return m.from === sel && m.to === i; });
+      var m = ms.filter(function (x) { return x.promo === 'Q'; })[0] || ms[0];
+      apply(m); render(); aiMove(); return;
+    }
+    if (p !== '.' && Chess.col(p) === human) {
+      sel = i; targets = Chess.legal(game).filter(function (m) { return m.from === i; }).map(function (m) { return m.to; });
+    } else { sel = -1; targets = []; }
+    render();
+  });
+  boardEl.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.target.click(); } });
+  function start() {
+    human = $('#side').value; depth = +$('#lvl').value; game = Chess.newGame(); hist = []; sel = -1; targets = []; last = null; busy = false;
+    camRot = human === 'w' ? 0 : 180; cam(); render(); aiMove();
+  }
+  $('#new').onclick = start; $('#side').onchange = start; $('#lvl').onchange = function () { depth = +this.value; };
+  $('#undo').onclick = function () {
+    if (busy || !hist.length) return;
+    var n = game.turn === human ? 2 : 1; // urungkan langkahmu dan balasan komputer
+    while (n-- && hist.length) { var h = hist.pop(); game = h.state; last = h.last; }
+    sel = -1; targets = []; render();
+  };
+  function cam() { var r = document.documentElement.style; r.setProperty('--rot', camRot + 'deg'); r.setProperty('--tilt', tilt + 'deg'); $('#tilt').value = tilt; }
+  $('#rl').onclick = function () { camRot -= 45; cam(); }; $('#rr').onclick = function () { camRot += 45; cam(); };
+  $('#tilt').oninput = function () { tilt = +this.value; cam(); };
+  $('#flat').onclick = function () { tilt = tilt > 5 ? 0 : 52; if (tilt === 0) camRot = human === 'w' ? 0 : 180; cam(); };
+  var drag = null, sc = $('#scene');
+  sc.addEventListener('pointerdown', function (e) { if (e.target.closest('.sq')) return; drag = { x: e.clientX, y: e.clientY, r: camRot, t: tilt }; sc.setPointerCapture(e.pointerId); });
+  sc.addEventListener('pointermove', function (e) { if (!drag) return; camRot = drag.r + (e.clientX - drag.x) * .4; tilt = Math.max(0, Math.min(70, drag.t + (e.clientY - drag.y) * .2)); cam(); });
+  sc.addEventListener('pointerup', function () { drag = null; });
+  build(); start();
+})();
+</script>
+</body>
+</html>

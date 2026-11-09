@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="night">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pixel Quest To-Do | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_shared/shared.css">
+<style>.item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:4px dotted var(--muted)}.item span{flex:1}
+.item.done span{text-decoration:line-through;opacity:.6}
+.chk,.x{width:32px;height:32px;border:0;background:var(--bg);color:var(--green);font-size:1.1rem;cursor:pointer;box-shadow:-3px 0 0 var(--line),3px 0 0 var(--line),0 -3px 0 var(--line),0 3px 0 var(--line)}.x{color:var(--pink)}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}.tabs .btn[aria-pressed=true]{background:var(--gold);color:#1b1630}
+.pri{font-size:.95rem;padding:2px 8px;margin-left:8px;color:#1b1630}.pri.t{background:var(--pink)}.pri.s{background:var(--gold)}.pri.r{background:var(--green)}
+.edit{width:32px;height:32px;border:0;background:var(--bg);color:var(--cyan);cursor:pointer;box-shadow:-3px 0 0 var(--line),3px 0 0 var(--line),0 -3px 0 var(--line),0 3px 0 var(--line)}
+.item input.ed{flex:1;min-width:0}.stats{display:flex;gap:18px;flex-wrap:wrap;margin-top:6px}
+select.grow-sel{background:var(--bg);color:var(--text);border:0;padding:8px;font:inherit;box-shadow:-3px 0 0 var(--line),3px 0 0 var(--line),0 -3px 0 var(--line),0 3px 0 var(--line)}
+</style>
+</head>
+<body data-title="Pixel Quest To-Do">
+<main class="app">
+
+<h1>Pixel Quest To-Do</h1>
+<section class="box">
+  <div class="row"><h2 id="lv" style="margin:0">Level 1</h2><span id="xp" class="muted"></span></div>
+  <div class="bar"><span id="fill"></span></div>
+  <p class="muted" style="margin-top:12px">Quest ringan 5 XP, sedang 10 XP, berat 20 XP. Setiap 50 XP kamu naik level.</p>
+  <p class="stats muted"><span id="sA"></span><span id="sD"></span><span id="sT"></span></p>
+</section>
+<section class="box">
+  <form id="f" class="row"><input id="t" class="grow" placeholder="Tulis quest baru" maxlength="80" required aria-label="Quest baru">
+    <select id="p" class="grow-sel" aria-label="Tingkat quest"><option value="r">Ringan +5</option><option value="s" selected>Sedang +10</option><option value="t">Berat +20</option></select>
+    <button class="btn gold" type="submit">Tambah</button></form>
+  <div class="tabs" role="group" aria-label="Filter quest"><button class="btn btn-sm" data-f="all" aria-pressed="true">Semua</button><button class="btn btn-sm" data-f="act" aria-pressed="false">Aktif</button><button class="btn btn-sm" data-f="done" aria-pressed="false">Selesai</button></div>
+  <ul id="list" style="margin-top:14px"></ul>
+  <div class="row"><button class="btn btn-sm" id="clr">Hapus quest selesai</button><button class="btn btn-sm pink" id="rst">Reset semua</button></div>
+</section>
+</main>
+<script src="../_shared/shared.js"></script>
+<script>
+var K='jh-quest',XPV={r:5,s:10,t:20},LBL={r:'Ringan',s:'Sedang',t:'Berat'},TITLE=['Pemula','Petualang','Pendekar','Ksatria','Legenda'];
+var s=load(K,{xp:0,q:[],done:0}),flt='all',edit=-1;
+s.q.forEach(function(q){if(!q.p)q.p='s'});
+function gain(q){return XPV[q.p]||10}
+function render(){var lv=Math.floor(s.xp/50)+1,cur=s.xp%50;
+  $('#lv').textContent='Level '+lv+' · '+TITLE[Math.min(lv-1,TITLE.length-1)];$('#xp').textContent=cur+'/50 XP (total '+s.xp+')';$('#fill').style.width=(cur*2)+'%';
+  var act=s.q.filter(function(q){return!q.d}).length,dn=s.q.length-act;
+  $('#sA').textContent='Aktif: '+act;$('#sD').textContent='Selesai: '+dn;$('#sT').textContent='Total diselesaikan: '+(s.done||0);
+  var rows=s.q.map(function(q,i){return{q:q,i:i}}).filter(function(o){return flt==='all'||(flt==='act'?!o.q.d:o.q.d)});
+  $('#list').innerHTML=rows.map(function(o){var q=o.q,i=o.i;
+    var mid=edit===i?'<input class="ed" id="ed" value="'+esc(q.t)+'" maxlength="80" aria-label="Ubah quest">':'<span>'+esc(q.t)+'<em class="pri '+q.p+'">'+LBL[q.p]+' +'+gain(q)+'</em></span>';
+    return '<li class="item'+(q.d?' done':'')+'"><button class="chk" data-i="'+i+'" aria-label="Tandai selesai">'+(q.d?'&#10004;':'')+'</button>'+mid+
+      '<button class="edit" data-e="'+i+'" aria-label="'+(edit===i?'Simpan':'Ubah')+' quest">'+(edit===i?'&#10003;':'&#9998;')+'</button><button class="x" data-x="'+i+'" aria-label="Hapus quest">&#10006;</button></li>'}).join('')||
+    '<li class="muted">'+(s.q.length?'Tidak ada quest di filter ini.':'Belum ada quest. Tambahkan quest pertamamu di atas.')+'</li>';
+  Array.prototype.forEach.call(document.querySelectorAll('[data-f]'),function(b){b.setAttribute('aria-pressed',b.dataset.f===flt)});
+  if(edit>-1){var e=$('#ed');if(e){e.focus();e.setSelectionRange(e.value.length,e.value.length)}}
+  save(K,s)}
+$('#f').addEventListener('submit',function(e){e.preventDefault();var v=$('#t').value.trim();if(!v)return;s.q.unshift({t:v,d:false,p:$('#p').value});edit=-1;$('#t').value='';render()});
+$('#list').addEventListener('click',function(e){var c=e.target.closest('.chk'),x=e.target.closest('.x'),ed=e.target.closest('.edit');
+  if(c){var q=s.q[+c.dataset.i],lv0=Math.floor(s.xp/50);q.d=!q.d;s.xp=Math.max(0,s.xp+(q.d?gain(q):-gain(q)));s.done=Math.max(0,(s.done||0)+(q.d?1:-1));if(Math.floor(s.xp/50)>lv0)toast('Naik level! Sekarang level '+(lv0+2));render()}
+  if(x){if(edit===+x.dataset.x)edit=-1;s.q.splice(+x.dataset.x,1);edit=-1;render()}
+  if(ed){var i=+ed.dataset.e;if(edit===i){var v=($('#ed').value||'').trim();if(v)s.q[i].t=v;edit=-1}else edit=i;render()}});
+$('#list').addEventListener('keydown',function(e){if(e.target.id==='ed'){if(e.key==='Enter'){var v=e.target.value.trim();if(v)s.q[edit].t=v;edit=-1;render()}if(e.key==='Escape'){edit=-1;render()}}});
+document.addEventListener('click',function(e){var b=e.target.closest('[data-f]');if(b){flt=b.dataset.f;edit=-1;render()}});
+$('#clr').addEventListener('click',function(){s.q=s.q.filter(function(q){return!q.d});edit=-1;render()});
+$('#rst').addEventListener('click',function(){if(confirm('Hapus semua quest dan reset XP?')){s={xp:0,q:[],done:0};edit=-1;render()}});
+render();
+</script>
+</body></html>

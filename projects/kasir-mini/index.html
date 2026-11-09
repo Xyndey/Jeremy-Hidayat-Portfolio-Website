@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="night">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kasir Mini | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_shared/shared.css">
+
+</head>
+<body data-title="Kasir Mini">
+<main class="app">
+
+<h1>Kasir Mini</h1>
+<div class="row" style="align-items:flex-start;gap:24px">
+<section class="grid grow" style="flex:2;min-width:280px;grid-template-columns:repeat(auto-fill,minmax(150px,1fr))" id="p"></section>
+<aside class="box grow" style="min-width:260px"><h2>Transaksi</h2><ul id="cart"></ul><p class="pf" id="tot" style="font-size:.7rem"></p>
+<label>Diskon (%) <input id="dsc" type="number" min="0" max="100" step="5" value="0" inputmode="numeric"></label>
+<label>Uang diterima <input id="pay" type="number" min="0" step="500" inputmode="numeric"></label><p id="chg" class="muted"></p><div class="row" id="quick"></div>
+<button class="btn gold" id="ok">Bayar dan cetak struk</button><button class="btn btn-sm" id="clr">Kosongkan</button></aside></div>
+<section class="box"><h2>Penjualan hari ini</h2><p id="sum"></p><ul id="hist"></ul><button class="btn btn-sm" id="csv">Unduh CSV</button> <button class="btn btn-sm pink" id="rst">Hapus riwayat</button></section>
+<div class="box" id="rc" hidden><h2>Struk</h2><pre id="rt" style="font:inherit;white-space:pre-wrap;margin:0 0 12px"></pre><button class="btn btn-sm" onclick="window.print()">Cetak</button><button class="btn btn-sm" id="cl">Tutup</button></div>
+</main>
+<script src="../_shared/shared.js"></script>
+<script>
+
+var PR=[['Nasi Goreng',15000],['Mie Goreng',13000],['Ayam Goreng',14000],['Roti Bakar',8000],['Kopi',6000],['Es Teh',4000],['Air Mineral',3000],['Keripik',5000]];
+var cart={},H=load('jh-kasir',[]);
+function today(){return new Date().toDateString()}
+function sub(){return Object.keys(cart).reduce(function(s,i){return s+cart[i]*PR[i][1]},0)}
+function disc(){var d=Math.min(100,Math.max(0,+$('#dsc').value||0));return Math.round(sub()*d/100)}
+function total(){return sub()-disc()}
+function render(){var t=total();
+  $('#p').innerHTML=PR.map(function(p,i){return '<button class="btn" style="text-align:left;margin:4px" data-a="'+i+'">'+esc(p[0])+'<br><span style="font:inherit;font-size:1.2rem">'+rp(p[1])+'</span></button>'}).join('');
+  $('#cart').innerHTML=Object.keys(cart).map(function(i){return '<li class="row" style="justify-content:space-between"><span>'+esc(PR[i][0])+' x'+cart[i]+'</span><span>'+rp(cart[i]*PR[i][1])+' <button class="btn btn-sm" data-d="'+i+'" aria-label="Kurangi">-</button></span></li>'}).join('')||'<li class="muted">Pilih produk di sebelah kiri.</li>';
+  $('#tot').textContent=(disc()?'Subtotal '+rp(sub())+' | Diskon -'+rp(disc())+' | ':'')+'Total '+rp(t);var qk=[t,10000,20000,50000,100000].filter(function(v,i,a){return v>0&&a.indexOf(v)===i&&(i===0||v>=t)});$('#quick').innerHTML=qk.map(function(v,i){return '<button class="btn btn-sm" data-q="'+v+'">'+(i===0?'Uang pas':rp(v))+'</button>'}).join('');var pay=+$('#pay').value||0;$('#chg').textContent=pay?(pay>=t?'Kembalian '+rp(pay-t):'Uang kurang '+rp(t-pay)):'';
+  var td=H.filter(function(h){return h.day===today()});$('#sum').textContent=td.length+' transaksi | Omzet '+rp(td.reduce(function(s,h){return s+h.total},0));
+  $('#hist').innerHTML=td.slice().reverse().map(function(h){return '<li class="row" style="justify-content:space-between;padding:6px 0;border-bottom:4px dotted var(--muted)"><span>'+esc(h.time)+' &middot; '+esc(h.lines)+'</span><b>'+rp(h.total)+'</b></li>'}).join('')||'<li class="muted">Belum ada transaksi hari ini.</li>'}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  if(b.dataset.q){$('#pay').value=b.dataset.q}
+  if(b.dataset.a){cart[b.dataset.a]=(cart[b.dataset.a]||0)+1}
+  if(b.dataset.d){if(--cart[b.dataset.d]<=0)delete cart[b.dataset.d]}render()});
+$('#pay').addEventListener('input',render);$('#dsc').addEventListener('input',render);
+$('#csv').onclick=function(){var rows=['Tanggal,Jam,Item,Total'];H.forEach(function(h){rows.push([h.day,h.time,'"'+h.lines.replace(/"/g,'""')+'"',h.total].join(','))});var a=document.createElement('a');a.href=URL.createObjectURL(new Blob([rows.join('\n')],{type:'text/csv'}));a.download='riwayat-kasir.csv';a.click();toast('Riwayat diunduh')};
+$('#clr').onclick=function(){cart={};$('#pay').value='';render()};
+$('#ok').onclick=function(){var t=total(),pay=+$('#pay').value||0;if(!t){toast('Keranjang masih kosong');return}if(pay<t){toast('Uang yang diterima kurang');return}
+  var now=new Date(),time=now.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}),lines=Object.keys(cart).map(function(i){return PR[i][0]+' x'+cart[i]}).join(', ');
+  var r='KASIR MINI\n'+now.toLocaleString('id-ID')+'\n--------------------\n'+Object.keys(cart).map(function(i){return PR[i][0]+' x'+cart[i]+'  '+rp(cart[i]*PR[i][1])}).join('\n')+'\n--------------------'+(disc()?'\nDiskon   -'+rp(disc()):'')+'\nTotal    '+rp(t)+'\nTunai    '+rp(pay)+'\nKembali  '+rp(pay-t)+'\n\nTerima kasih!';
+  H.push({day:today(),time:time,lines:lines,total:t});save('jh-kasir',H);$('#rt').textContent=r;$('#rc').hidden=false;cart={};$('#pay').value='';$('#dsc').value=0;render()};
+$('#cl').onclick=function(){$('#rc').hidden=true};
+$('#rst').onclick=function(){if(confirm('Hapus semua riwayat penjualan?')){H=[];save('jh-kasir',H);render()}};
+render();
+</script>
+</body></html>

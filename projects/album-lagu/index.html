@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Album Lagu: Level Up | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0820;--p:#a855f7;--c:#22d3ee;--pk:#ff4fa3;--t:#f4f0ff;--m:#a79fc9;--panel:#ffffff12}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;color:var(--t);font:16px/1.5 Outfit,system-ui,sans-serif;background:radial-gradient(900px 600px at 15% 0,#3b1b72 0,transparent 60%),radial-gradient(900px 600px at 90% 100%,#0b4a63 0,transparent 60%),var(--bg);overflow-x:hidden}
+.bar{display:flex;gap:14px;align-items:center;flex-wrap:wrap;padding:10px 18px;background:#05030f;border-bottom:1px solid #ffffff1a}
+.bar a{color:var(--c);font-weight:700;text-decoration:none}.bar span{color:var(--m);font-size:.9rem}
+main{width:min(1060px,100% - 28px);margin:0 auto;padding:26px 0 50px}
+h1{font-size:clamp(1.8rem,5vw,3rem);font-weight:800;margin:0;line-height:1.1;background:linear-gradient(90deg,var(--c),var(--p),var(--pk));-webkit-background-clip:text;background-clip:text;color:transparent}
+.sub{color:var(--m);margin:6px 0 0}
+.stage{display:grid;grid-template-columns:1fr 1fr;gap:20px;align-items:center;margin-top:10px}
+@media(max-width:860px){.stage{grid-template-columns:1fr}}
+.ringwrap{perspective:1100px;height:340px;display:grid;place-items:center}
+.ring{position:relative;width:170px;height:170px;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.2,.8,.2,1)}
+.cover{position:absolute;inset:0;border-radius:18px;border:0;padding:0;cursor:pointer;color:#fff;display:grid;place-items:center;font-size:4rem;box-shadow:0 20px 40px #0008,inset 0 0 0 2px #ffffff30;backface-visibility:hidden;overflow:hidden;text-shadow:0 6px 18px #0007}
+.cover small{position:absolute;left:0;right:0;bottom:0;padding:18px 8px 8px;font:700 .8rem Outfit;background:linear-gradient(transparent,#000a);text-shadow:none}
+.cover.on{box-shadow:0 20px 50px #0009,0 0 0 3px #fff,0 0 40px var(--glow)}
+.player{background:var(--panel);border:1px solid #ffffff22;border-radius:22px;padding:22px;backdrop-filter:blur(14px);box-shadow:0 30px 60px #0007}
+.vinylbox{perspective:800px;display:grid;place-items:center;margin-bottom:14px}
+.vinyl{width:150px;height:150px;border-radius:50%;background:repeating-radial-gradient(circle,#15122a 0 3px,#0b0918 3px 6px);box-shadow:0 14px 30px #000a,inset 0 0 0 4px #000;position:relative;transform:rotateX(35deg);animation:spin 3.2s linear infinite;animation-play-state:paused}
+.vinyl.on{animation-play-state:running}
+.vinyl::before{content:"";position:absolute;inset:0;border-radius:50%;background:conic-gradient(from 30deg,transparent 0 20%,#ffffff22 25%,transparent 32% 70%,#ffffff1a 75%,transparent 82%)}
+.vinyl i{position:absolute;inset:34%;border-radius:50%;display:grid;place-items:center;font-style:normal;font-size:1.6rem;background:var(--lab,var(--p));box-shadow:0 0 0 3px #00000055}
+@keyframes spin{from{transform:rotateX(35deg) rotateZ(0)}to{transform:rotateX(35deg) rotateZ(360deg)}}
+.title{font-weight:800;font-size:1.4rem;margin:0}.meta{color:var(--m);margin:0 0 12px}
+canvas{width:100%;height:56px;display:block;margin:6px 0 12px}
+.prog{display:flex;align-items:center;gap:10px;font-size:.85rem;color:var(--m)}
+input[type=range]{flex:1;accent-color:var(--pk)}
+.ctl{display:flex;gap:10px;align-items:center;justify-content:center;margin-top:12px;flex-wrap:wrap}
+.ctl button{font:inherit;color:var(--t);background:#ffffff18;border:1px solid #ffffff2a;width:46px;height:46px;border-radius:50%;cursor:pointer;font-size:1.1rem}
+.ctl button:hover{background:#ffffff2e}.ctl button.play{width:60px;height:60px;background:linear-gradient(135deg,var(--p),var(--pk));border:0;font-size:1.4rem;box-shadow:0 10px 26px #a855f766}
+.ctl button[aria-pressed=true]{outline:2px solid var(--c)}
+.vol{display:flex;gap:8px;align-items:center;color:var(--m);font-size:.85rem;margin-top:12px;justify-content:center}
+.list{margin-top:26px;display:grid;gap:8px}
+.tr{display:grid;grid-template-columns:34px 1fr auto;gap:12px;align-items:center;padding:10px 14px;background:var(--panel);border:1px solid #ffffff14;border-radius:14px;cursor:pointer;color:inherit;font:inherit;text-align:left;width:100%}
+.tr:hover,.tr.on{background:#ffffff22;border-color:var(--c)}.tr small{color:var(--m)}
+:focus-visible{outline:3px solid var(--c);outline-offset:2px}
+.note{color:var(--m);font-size:.88rem;margin-top:22px}
+@media(prefers-reduced-motion:reduce){.vinyl{animation:none}.ring{transition:none}}
+
+.hub{margin-top:34px;background:var(--panel);border:1px solid #ffffff22;border-radius:22px;padding:22px;backdrop-filter:blur(14px)}
+.hub h2{margin:0 0 4px;font-size:1.5rem}.hub p{color:var(--m);margin:0 0 14px}
+.hub form{display:flex;gap:10px;flex-wrap:wrap}.hub input[type=text],.hub input[type=search]{flex:1 1 260px;font:inherit;color:var(--t);background:#0b0820aa;border:1.5px solid #ffffff2a;border-radius:12px;padding:11px 14px}
+.hub .go{font:inherit;font-weight:800;color:#fff;border:0;border-radius:12px;padding:11px 20px;cursor:pointer;background:linear-gradient(135deg,var(--p),var(--pk))}
+.hub .ln{font:inherit;font-weight:700;color:var(--t);text-decoration:none;border-radius:12px;padding:11px 16px;border:1.5px solid #ffffff2a;background:#ffffff12}.hub .ln:hover{border-color:var(--c)}
+.hub .sp{border-color:#1db95488}.hub .yt{border-color:#ff4e4588}
+.hub .row2{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+.msg2{min-height:1.4em;font-size:.88rem;color:var(--c);margin:8px 0 0}.msg2.bad{color:#ff8fa3}
+.embed{margin-top:14px}.embed iframe{width:100%;border:0;border-radius:14px;background:#000}
+.col{display:grid;gap:8px;margin-top:14px}
+.ci{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:9px 12px;border-radius:12px;background:#ffffff10;border:1px solid #ffffff14}
+.ci b{font-size:.78rem;padding:3px 9px;border-radius:99px;color:#04111a}.ci b.s{background:#1db954}.ci b.y{background:#ff6b63}
+.ci span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--m);font-size:.88rem}
+.ci button{font:inherit;font-size:.82rem;color:var(--t);background:transparent;border:1px solid #ffffff2a;border-radius:10px;padding:5px 11px;cursor:pointer}.ci button:hover{border-color:var(--c)}
+
+.hub .row2{align-items:center}.hub .go{text-decoration:none;display:inline-block}
+.hub-player{margin-top:14px;padding:14px;border-radius:16px;background:#0b0820aa;border:1px solid #ffffff22}.hub-player[hidden]{display:none}
+.hub-player .now{margin:0 0 8px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hub-player .prog{margin:6px 0}.hub-player .ctl{margin-top:8px}.hub-player .ctl button{width:44px;height:44px}
+.embed-fail{padding:16px;border-radius:14px;background:#ff4e4522;border:1px solid #ff8fa3}.embed-fail p{margin:6px 0 12px;color:var(--t)}
+.ci{grid-template-columns:44px 1fr auto auto}.ci img{width:44px;height:44px;border-radius:8px;object-fit:cover}.ci b{display:grid;place-items:center;width:44px;height:44px;border-radius:8px;padding:0}.ci>span{display:grid}.ci strong{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.95rem}.ci small{color:var(--m);font-size:.78rem}.ci.on{border-color:var(--c);background:#22d3ee14}
+</style>
+</head>
+<body>
+<div class="bar"><a href="../../index.html#projects">&larr; Portofolio</a><span>Album lagu instrumental 8-bit, semua nada dibuat langsung oleh kode (Web Audio API).</span></div>
+<main>
+<h1>Level Up</h1>
+<p class="sub">Album chiptune orisinal oleh Jeremy Hidayat. Putar carousel 3D dan pilih lagu.</p>
+<div class="stage">
+  <div class="ringwrap"><div class="ring" id="ring"></div></div>
+  <section class="player" aria-label="Pemutar">
+    <div class="vinylbox"><div class="vinyl" id="vinyl"><i id="vlab">🎵</i></div></div>
+    <p class="title" id="ttl">Pilih lagu</p><p class="meta" id="meta">&nbsp;</p>
+    <canvas id="viz" width="600" height="112" aria-hidden="true"></canvas>
+    <div class="prog"><span id="cur">0:00</span><input type="range" id="seek" min="0" max="1000" value="0" aria-label="Posisi lagu"><span id="dur">0:00</span></div>
+    <div class="ctl"><button id="shuf" aria-pressed="false" title="Acak">&#8644;</button><button id="prev" aria-label="Sebelumnya">&#9198;</button><button class="play" id="play" aria-label="Putar">&#9654;</button><button id="next" aria-label="Berikutnya">&#9197;</button><button id="loop" aria-pressed="false" title="Ulangi lagu">&#8635;</button></div>
+    <div class="vol"><span>Volume</span><input type="range" id="vol" min="0" max="100" value="70" aria-label="Volume" style="max-width:180px"></div>
+  </section>
+</div>
+<div class="list" id="list"></div>
+<section class="hub" aria-labelledby="hubT">
+  <h2 id="hubT">Koleksi Spotify dan YouTube Music</h2>
+  <p>Tempel tautan lagu, album, playlist, atau video dari Spotify, YouTube, atau YouTube Music. Lagu langsung diputar di bawah, dan koleksimu tersimpan di browser ini. Catatan: sebagian video musik resmi melarang diputar di situs lain; jika begitu, tombol “Buka di YouTube” akan muncul.</p>
+  <form id="hf"><input type="text" id="hl" placeholder="https://open.spotify.com/... atau https://music.youtube.com/watch?v=..." aria-label="Tautan Spotify atau YouTube Music" autocomplete="off"><button class="go" type="submit">Putar</button><button class="ln" type="button" id="hpaste">Tempel &amp; putar</button></form>
+  <div class="row2"><input type="search" id="hs" placeholder="Cari lagu atau artis" aria-label="Cari lagu atau artis" style="flex:1 1 200px;font:inherit;color:var(--t);background:#0b0820aa;border:1.5px solid #ffffff2a;border-radius:12px;padding:11px 14px"><a class="ln sp" id="hsp" target="_blank" rel="noopener">Cari di Spotify</a><a class="ln yt" id="hyt" target="_blank" rel="noopener">Cari di YouTube Music</a></div>
+  <p class="msg2" id="hm" role="status"></p>
+  <div class="embed" id="he"></div><div class="hub-player" id="hp" hidden><p class="now" id="hnow"></p><div class="prog"><span id="hcur">0:00</span><input type="range" id="hseek" min="0" max="1000" value="0" aria-label="Posisi lagu"><span id="hdur">0:00</span></div><div class="ctl"><button type="button" id="hprev" aria-label="Sebelumnya">&#9198;</button><button type="button" class="play" id="hplay" aria-label="Putar atau jeda">&#10074;&#10074;</button><button type="button" id="hnext" aria-label="Berikutnya">&#9197;</button></div><div class="vol"><span>Volume</span><input type="range" id="hvol" min="0" max="100" value="80" aria-label="Volume pemutar luar" style="max-width:180px"></div></div>
+  <div class="col" id="hc" aria-label="Koleksiku"></div>
+</section>
+<p class="note">Semua lagu instrumental dan dibuat sendiri, jadi tidak ada lirik atau rekaman milik pihak lain.</p>
+</main>
+<script>
+(function () {
+  var NOTE = function (m) { return 440 * Math.pow(2, (m - 69) / 12); };
+  var T = [
+    { t: 'Pixel Sunrise', s: 'Pembuka ceria', bpm: 118, root: 60, prog: [[0, 'M'], [9, 'm'], [5, 'M'], [7, 'M']], seed: 11, lead: 'square', e: '🌅', c: ['#f97316', '#ec4899'] },
+    { t: 'Boss Level', s: 'Tegang dan cepat', bpm: 152, root: 57, prog: [[0, 'm'], [8, 'M'], [3, 'M'], [10, 'M']], seed: 23, lead: 'sawtooth', e: '👾', c: ['#ef4444', '#7c3aed'] },
+    { t: 'Coin Rain', s: 'Arpeggio riang', bpm: 132, root: 67, prog: [[0, 'M'], [5, 'M'], [9, 'm'], [7, 'M']], seed: 37, lead: 'square', e: '🪙', c: ['#facc15', '#f97316'] },
+    { t: 'Night Arcade', s: 'Santai malam hari', bpm: 98, root: 62, prog: [[0, 'm'], [10, 'M'], [8, 'M'], [7, 'm']], seed: 41, lead: 'triangle', e: '🕹️', c: ['#6366f1', '#06b6d4'] },
+    { t: 'Batam Harbor', s: 'Angin laut sore', bpm: 108, root: 65, prog: [[0, 'M'], [7, 'M'], [9, 'm'], [5, 'M']], seed: 59, lead: 'square', e: '⚓', c: ['#0ea5e9', '#10b981'] },
+    { t: 'Credits Roll', s: 'Penutup haru', bpm: 86, root: 64, prog: [[0, 'm'], [7, 'm'], [5, 'M'], [3, 'M']], seed: 73, lead: 'triangle', e: '🎬', c: ['#a855f7', '#ec4899'] }
+  ];
+  var BARS = 16, SPB = 16;
+  function rng(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function build(tr) {
+    var r = rng(tr.seed), ev = [], PENT = [0, 2, 4, 7, 9], bar, st;
+    var mask = []; for (st = 0; st < 16; st++) mask.push(r() < (st % 4 === 0 ? .9 : st % 2 === 0 ? .55 : .3));
+    for (bar = 0; bar < BARS; bar++) {
+      var ch = tr.prog[bar % 4], root = tr.root + ch[0], tri = ch[1] === 'M' ? [0, 4, 7] : [0, 3, 7], phase = bar >= 8 ? 1 : 0, last = tri[0];
+      for (st = 0; st < SPB; st++) {
+        var e = { bass: null, lead: null, kick: false, snare: false, hat: false };
+        if (st % 4 === 0) e.bass = root - 24 + (st === 8 && bar % 2 ? 7 : 0);
+        if (st === 10 && bar % 2 === 0) e.bass = root - 24 + 7;
+        e.kick = st === 0 || st === 8 || (phase && (st === 6 || st === 14) && r() < .6);
+        e.snare = st === 4 || st === 12; e.hat = st % 2 === 0 || (phase && r() < .3);
+        if (mask[st] && (bar % 4 !== 3 || st < 12)) {
+          var pick = r() < .6 ? tri[Math.floor(r() * 3)] : PENT[Math.floor(r() * 5)];
+          var oct = (phase && r() < .35) ? 24 : 12; last = pick; e.lead = root + oct + pick;
+        }
+        ev.push(e);
+      }
+    }
+    return ev;
+  }
+  var tracks = T.map(function (t) { t.ev = build(t); t.step = 60 / t.bpm / 4; t.dur = t.ev.length * t.step; return t; });
+  var AC, master, an, nbuf, vol = .7, cur = 0, pos = 0, playing = false, loop = false, shuf = false, timer = null, nextT = 0, startedAt = 0, startPos = 0;
+  var $ = function (s) { return document.querySelector(s); };
+  function ensure() {
+    if (!AC) {
+      AC = new (window.AudioContext || window.webkitAudioContext)(); master = AC.createGain(); master.gain.value = vol * .5;
+      an = AC.createAnalyser(); an.fftSize = 128; master.connect(an); an.connect(AC.destination);
+      nbuf = AC.createBuffer(1, AC.sampleRate, AC.sampleRate); var d = nbuf.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if (AC.state === 'suspended') AC.resume();
+  }
+  function tone(type, f, t, dur, g) { var o = AC.createOscillator(), a = AC.createGain(); o.type = type; o.frequency.setValueAtTime(f, t); a.gain.setValueAtTime(.0001, t); a.gain.exponentialRampToValueAtTime(g, t + .01); a.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(a); a.connect(master); o.start(t); o.stop(t + dur + .03); }
+  function kick(t) { var o = AC.createOscillator(), a = AC.createGain(); o.frequency.setValueAtTime(150, t); o.frequency.exponentialRampToValueAtTime(40, t + .12); a.gain.setValueAtTime(.9, t); a.gain.exponentialRampToValueAtTime(.0001, t + .16); o.connect(a); a.connect(master); o.start(t); o.stop(t + .2); }
+  function noise(t, dur, g, hp) { var s = AC.createBufferSource(), f = AC.createBiquadFilter(), a = AC.createGain(); s.buffer = nbuf; f.type = 'highpass'; f.frequency.value = hp; a.gain.setValueAtTime(g, t); a.gain.exponentialRampToValueAtTime(.0001, t + dur); s.connect(f); f.connect(a); a.connect(master); s.start(t); s.stop(t + dur + .02); }
+  function play(i, p) { var e = tracks[cur].ev[i], tr = tracks[cur], t = p;
+    if (e.lead != null) tone(tr.lead, NOTE(e.lead), t, tr.step * 1.6, .22);
+    if (e.bass != null) tone('triangle', NOTE(e.bass), t, tr.step * 3.4, .5);
+    if (e.kick) kick(t); if (e.snare) noise(t, .12, .35, 1800); if (e.hat) noise(t, .04, .12, 7000); }
+  var stepIdx = 0;
+  function sched() { var tr = tracks[cur]; while (nextT < AC.currentTime + .15) { if (stepIdx >= tr.ev.length) { ended(); return; } play(stepIdx, nextT); nextT += tr.step; stepIdx++; } }
+  function ended() { if (loop) { stepIdx = 0; nextT = AC.currentTime + .05; return; } go(1, true); }
+  function clock() { var tr = tracks[cur]; return Math.max(0, Math.min(tr.dur, stepIdx * tr.step - Math.max(0, nextT - AC.currentTime))); }
+  function start() { ensure(); playing = true; nextT = AC.currentTime + .06; clearInterval(timer); timer = setInterval(sched, 30); ui(); }
+  function pause() { playing = false; clearInterval(timer); ui(); }
+  function select(i, auto) {
+    cur = (i + tracks.length) % tracks.length; stepIdx = 0; var tr = tracks[cur];
+    $('#ring').style.transform = 'translateZ(-260px) rotateY(' + (-cur * 60) + 'deg)';
+    $('#ttl').textContent = tr.t; $('#meta').textContent = tr.s + ' · ' + tr.bpm + ' BPM · ' + fmt(tr.dur);
+    $('#vlab').textContent = tr.e; $('#vinyl').style.setProperty('--lab', 'linear-gradient(135deg,' + tr.c[0] + ',' + tr.c[1] + ')'); $('#dur').textContent = fmt(tr.dur);
+    document.querySelectorAll('.cover').forEach(function (c, k) { c.classList.toggle('on', k === cur); });
+    document.querySelectorAll('.tr').forEach(function (c, k) { c.classList.toggle('on', k === cur); });
+    if (auto && playing) nextT = AC.currentTime + .08;
+  }
+  function go(d, auto) { var n = shuf && d > 0 ? Math.floor(Math.random() * tracks.length) : cur + d; select(n, auto); if (!playing) start(); else nextT = AC.currentTime + .08; }
+  function fmt(s) { s = Math.round(s); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); }
+  function ui() { $('#play').innerHTML = playing ? '&#10074;&#10074;' : '&#9654;'; $('#play').setAttribute('aria-label', playing ? 'Jeda' : 'Putar'); $('#vinyl').classList.toggle('on', playing); }
+  // UI awal
+  $('#ring').innerHTML = tracks.map(function (t, i) { return '<button class="cover" data-i="' + i + '" aria-label="' + t.t + '" style="background:linear-gradient(135deg,' + t.c[0] + ',' + t.c[1] + ');--glow:' + t.c[0] + ';transform:rotateY(' + (i * 60) + 'deg) translateZ(260px)">' + t.e + '<small>' + t.t + '</small></button>'; }).join('');
+  $('#list').innerHTML = tracks.map(function (t, i) { return '<button class="tr" data-i="' + i + '"><span>' + (i + 1) + '</span><span><b>' + t.t + '</b><br><small>' + t.s + '</small></span><small>' + fmt(t.dur) + '</small></button>'; }).join('');
+  document.addEventListener('keydown', function (e) {
+    var t = e.target; if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.tagName === 'SELECT' || t.tagName === 'BUTTON')) return;
+    var id = e.code === 'Space' ? 'play' : e.key === 'ArrowRight' ? 'next' : e.key === 'ArrowLeft' ? 'prev' : e.key === 's' ? 'shuf' : e.key === 'r' ? 'loop' : '';
+    if (id) { e.preventDefault(); document.getElementById(id).click(); }
+  });
+  document.addEventListener('click', function (e) { var b = e.target.closest('.cover,.tr'); if (!b) return; var i = +b.dataset.i; select(i, true); if (!playing) start(); else nextT = AC.currentTime + .08; });
+  $('#play').onclick = function () { if (playing) pause(); else start(); };
+  $('#next').onclick = function () { go(1); }; $('#prev').onclick = function () { go(-1); };
+  $('#loop').onclick = function () { loop = !loop; this.setAttribute('aria-pressed', loop); }; $('#shuf').onclick = function () { shuf = !shuf; this.setAttribute('aria-pressed', shuf); };
+  $('#vol').oninput = function () { vol = this.value / 100; if (master) master.gain.value = vol * .5; };
+  $('#seek').oninput = function () { var tr = tracks[cur]; stepIdx = Math.floor(this.value / 1000 * tr.ev.length); if (AC) nextT = AC.currentTime + .05; };
+  var cv = $('#viz'), cx = cv.getContext('2d');
+  (function frame() {
+    var tr = tracks[cur]; cx.clearRect(0, 0, cv.width, cv.height);
+    if (AC && an) {
+      var d = new Uint8Array(an.frequencyBinCount); an.getByteFrequencyData(d); var n = 32, w = cv.width / n;
+      for (var i = 0; i < n; i++) { var h = playing ? d[i] / 255 * cv.height : 2; var g = cx.createLinearGradient(0, cv.height, 0, 0); g.addColorStop(0, tr.c[1]); g.addColorStop(1, tr.c[0]); cx.fillStyle = g; cx.fillRect(i * w + 3, cv.height - h, w - 6, h); }
+    }
+    if (playing && AC) { var c = clock(); $('#cur').textContent = fmt(c); if (document.activeElement !== $('#seek')) $('#seek').value = c / tr.dur * 1000; }
+    requestAnimationFrame(frame);
+  })();
+  select(0); ui();
+  window.__album = { tracks: tracks };
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (s) { return document.querySelector(s); }, KEY = 'jh-album-koleksi-v2', col = [], cur = -1, yt = null, ytTimer = null, sp = null, ytReady = null, spReady = null;
+  function esc(t) { return String(t).replace(/[&<>"']/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]; }); }
+  try { col = JSON.parse(localStorage.getItem(KEY) || '[]'); if (!Array.isArray(col)) col = []; } catch (e) { col = []; }
+  function persist() { try { localStorage.setItem(KEY, JSON.stringify(col.slice(0, 40))); } catch (e) { } }
+  var isFile = location.protocol === 'file:';
+
+  /* ---- baca tautan -> {kind, id/type, url, label} ---- */
+  function parse(raw) {
+    raw = String(raw || '').trim(); if (!raw) return null;
+    var m = raw.match(/^spotify:(track|album|playlist|artist|episode|show):([A-Za-z0-9]{22})$/);
+    if (m) return { kind: 's', type: m[1], id: m[2], url: 'https://open.spotify.com/' + m[1] + '/' + m[2] };
+    if (!/^https?:\/\//i.test(raw)) { if (/^(www\.)?(open\.spotify|music\.youtube|youtube|youtu\.be|m\.youtube)/i.test(raw)) raw = 'https://' + raw; else return null; }
+    var u; try { u = new URL(raw); } catch (e) { return null; }
+    var host = u.hostname.replace(/^www\./, ''), p = u.pathname;
+    if (host === 'open.spotify.com' || host === 'play.spotify.com') {
+      p = p.replace(/^\/(intl-[a-z-]+|embed)\//i, '/').replace(/^\/embed\//, '/');
+      m = p.match(/\/(track|album|playlist|artist|episode|show)\/([A-Za-z0-9]{22})/);
+      return m ? { kind: 's', type: m[1], id: m[2], url: 'https://open.spotify.com/' + m[1] + '/' + m[2] } : null;
+    }
+    if (host === 'spotify.link' || host === 'spoti.fi') return { err: 'Tautan pendek Spotify tidak bisa dibaca. Buka tautannya di browser lalu salin alamat lengkap yang diawali open.spotify.com.' };
+    if (/(^|\.)youtube\.com$|^youtu\.be$|^youtube-nocookie\.com$/.test(host)) {
+      var v = null, l = u.searchParams.get('list');
+      if (host === 'youtu.be') v = p.slice(1).split('/')[0];
+      else if (u.searchParams.get('v')) v = u.searchParams.get('v');
+      else if ((m = p.match(/^\/(shorts|embed|live|v)\/([\w-]{11})/))) v = m[2];
+      if (v && /^[\w-]{11}$/.test(v)) return { kind: 'y', id: v, list: l && /^[\w-]+$/.test(l) ? l : '', music: host === 'music.youtube.com', url: 'https://' + (host === 'music.youtube.com' ? 'music.youtube.com' : 'www.youtube.com') + '/watch?v=' + v + (l ? '&list=' + l : '') };
+      if (l && /^[\w-]+$/.test(l)) return { kind: 'y', id: '', list: l, music: host === 'music.youtube.com', url: 'https://' + (host === 'music.youtube.com' ? 'music.youtube.com' : 'www.youtube.com') + '/playlist?list=' + l };
+    }
+    return null;
+  }
+  function note(t, bad) { var m = $('#hm'); m.textContent = t; m.className = 'msg2' + (bad ? ' bad' : ''); }
+
+  /* ---- judul lewat oEmbed (opsional; gagal = abaikan) ---- */
+  function meta(it) {
+    var u = it.kind === 's' ? 'https://open.spotify.com/oembed?url=' + encodeURIComponent(it.url) : 'https://www.youtube.com/oembed?format=json&url=' + encodeURIComponent(it.url);
+    return fetch(u).then(function (r) { return r.ok ? r.json() : Promise.reject(); }).then(function (j) { if (j.title) it.title = j.title; if (j.thumbnail_url) it.thumb = j.thumbnail_url; if (j.author_name) it.by = j.author_name; return it; }, function () { return it; });
+  }
+
+  /* ---- pemuat API ---- */
+  function loadYT() {
+    if (window.YT && YT.Player) return Promise.resolve();
+    return ytReady || (ytReady = new Promise(function (ok, no) {
+      var prev = window.onYouTubeIframeAPIReady; window.onYouTubeIframeAPIReady = function () { if (prev) prev(); ok(); };
+      var s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; s.onerror = function () { ytReady = null; no(new Error('api')); }; document.head.appendChild(s);
+      setTimeout(function () { if (!(window.YT && YT.Player)) { ytReady = null; no(new Error('timeout')); } }, 9000);
+    }));
+  }
+  function loadSP() {
+    if (window.__spApi) return Promise.resolve(window.__spApi);
+    return spReady || (spReady = new Promise(function (ok, no) {
+      window.onSpotifyIframeApiReady = function (api) { window.__spApi = api; ok(api); };
+      var s = document.createElement('script'); s.src = 'https://open.spotify.com/embed/iframe-api/v1'; s.async = true; s.onerror = function () { spReady = null; no(new Error('api')); }; document.head.appendChild(s);
+      setTimeout(function () { if (!window.__spApi) { spReady = null; no(new Error('timeout')); } }, 9000);
+    }));
+  }
+
+  /* ---- hentikan pemutar luar ---- */
+  function stopExt() {
+    clearInterval(ytTimer);
+    try { if (yt && yt.destroy) yt.destroy(); } catch (e) { } yt = null;
+    try { if (sp && sp.destroy) sp.destroy(); } catch (e) { } sp = null;
+    $('#he').innerHTML = ''; $('#hp').hidden = true;
+  }
+  window.__extStop = function () { try { if (yt && yt.pauseVideo) yt.pauseVideo(); if (sp && sp.pause) sp.pause(); } catch (e) { } };
+  function pauseChip() { var v = document.getElementById('vinyl'), b = document.getElementById('play'); if (v && v.classList.contains('on') && b) b.click(); }
+
+  function fail(it, msg) {
+    $('#he').innerHTML = '<div class="embed-fail"><b>Lagu tidak bisa diputar di sini</b><p>' + esc(msg) + '</p><a class="go" target="_blank" rel="noopener" href="' + esc(it.url) + '">Buka di ' + (it.kind === 's' ? 'Spotify' : it.music ? 'YouTube Music' : 'YouTube') + '</a></div>';
+    $('#hp').hidden = true;
+  }
+  var fmt = function (s) { s = Math.max(0, Math.round(s || 0)); return Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0'); };
+
+  /* ---- putar ---- */
+  function play(i) {
+    if (i < 0 || i >= col.length) return; cur = i; var it = col[i]; pauseChip(); stopExt(); draw();
+    $('#hnow').textContent = (it.title || (it.kind === 's' ? 'Spotify ' + it.type : 'YouTube')) + (it.by ? ' · ' + it.by : '');
+    if (isFile) { fail(it, 'Pemutar YouTube dan Spotify menolak halaman yang dibuka dari berkas lokal (file://). Jalankan lewat server (npx serve .) atau buka versi yang sudah di-deploy di Vercel.'); return; }
+    var box = document.createElement('div'); box.id = 'hbox'; $('#he').appendChild(box); $('#hp').hidden = false; $('#hplay').innerHTML = '&#10074;&#10074;';
+    if (it.kind === 'y') {
+      loadYT().then(function () {
+        var vars = { autoplay: 1, playsinline: 1, rel: 0, modestbranding: 1, origin: location.origin };
+        var opts = { width: '100%', height: '315', playerVars: vars, events: {
+          onReady: function (e) { $('#hplay').innerHTML = '&#10074;&#10074;'; e.target.setVolume(+$('#hvol').value); try { e.target.playVideo(); } catch (x) { } ytTimer = setInterval(tick, 500); },
+          onStateChange: function (e) { var s = e.data; $('#hplay').innerHTML = s === 1 ? '&#10074;&#10074;' : '&#9654;'; if (s === 0) next(); },
+          onError: function (e) { var c = e.data, m = c === 101 || c === 150 || c === 153 ? 'Pemilik video tidak mengizinkan pemutaran di situs lain (kode ' + c + '). Banyak video musik resmi diblokir seperti ini. Coba tautan versi lain (lirik/audio) atau buka langsung di YouTube.' : c === 100 ? 'Video tidak ditemukan atau bersifat pribadi.' : c === 2 ? 'ID video tidak valid.' : 'Terjadi kesalahan pemutar (kode ' + c + ').'; fail(it, m); }
+        } };
+        if (it.id) { opts.videoId = it.id; if (it.list) vars.list = it.list; } else { vars.listType = 'playlist'; vars.list = it.list; }
+        yt = new YT.Player('hbox', opts);
+      }, function () { fail(it, 'Pemutar YouTube gagal dimuat. Periksa koneksi internet atau pemblokir iklan/privasi, lalu coba lagi.'); });
+    } else {
+      var h = (it.type === 'track' || it.type === 'episode') ? 152 : 352;
+      loadSP().then(function (api) {
+        api.createController(box, { uri: 'spotify:' + it.type + ':' + it.id, width: '100%', height: h }, function (c) {
+          sp = c; c.addListener('ready', function () { try { c.play(); } catch (x) { } });
+          c.addListener('playback_update', function (e) { var d = e.data || {}; $('#hplay').innerHTML = d.isPaused ? '&#9654;' : '&#10074;&#10074;'; if (d.duration) { $('#hseek').value = d.position / d.duration * 1000; $('#hcur').textContent = fmt(d.position / 1000); $('#hdur').textContent = fmt(d.duration / 1000); } if (d.duration && d.position >= d.duration - 400 && !d.isPaused) { } });
+        });
+      }, function () {
+        box.outerHTML = '<iframe src="https://open.spotify.com/embed/' + it.type + '/' + it.id + '?utm_source=generator" height="' + h + '" width="100%" style="border:0;border-radius:14px" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Pemutar Spotify"></iframe>'; $('#hp').hidden = true; note('API pemutar Spotify tidak termuat, memakai pemutar standar: tekan tombol play di dalamnya.');
+      });
+    }
+  }
+  function tick() { if (!yt || !yt.getCurrentTime) return; try { var d = yt.getDuration(), c = yt.getCurrentTime(); $('#hcur').textContent = fmt(c); $('#hdur').textContent = fmt(d); if (document.activeElement !== $('#hseek') && d) $('#hseek').value = c / d * 1000; } catch (e) { } }
+  function next() { if (col.length > 1 && cur >= 0) play((cur + 1) % col.length); }
+  function prev() { if (col.length > 1 && cur >= 0) play((cur - 1 + col.length) % col.length); }
+
+  /* ---- koleksi ---- */
+  function draw() {
+    $('#hc').innerHTML = col.map(function (c, i) {
+      return '<div class="ci' + (i === cur ? ' on' : '') + '">' + (c.thumb ? '<img src="' + esc(c.thumb) + '" alt="" loading="lazy" referrerpolicy="no-referrer">' : '<b class="' + c.kind + '">' + (c.kind === 's' ? 'S' : 'Y') + '</b>') + '<span title="' + esc(c.url) + '"><strong>' + esc(c.title || (c.kind === 's' ? 'Spotify ' + c.type : c.music ? 'YouTube Music' : 'YouTube')) + '</strong><small>' + (c.kind === 's' ? 'Spotify' : c.music ? 'YouTube Music' : 'YouTube') + (c.by ? ' · ' + esc(c.by) : '') + '</small></span><button type="button" data-p="' + i + '">' + (i === cur ? 'Memutar' : 'Putar') + '</button><button type="button" data-d="' + i + '" aria-label="Hapus dari koleksi">Hapus</button></div>';
+    }).join('') || '<p style="margin:0;color:var(--m)">Koleksi masih kosong. Tempel tautan di atas untuk mulai.</p>';
+  }
+  function add(raw) {
+    var it = parse(raw); if (!it) { note('Tautan tidak dikenali. Gunakan tautan lagu/album/playlist dari open.spotify.com, atau video dari youtube.com, youtu.be, dan music.youtube.com.', true); return; }
+    if (it.err) { note(it.err, true); return; }
+    var idx = col.findIndex(function (c) { return c.kind === it.kind && c.id === it.id && (c.list || '') === (it.list || '') && c.type === it.type; });
+    if (idx < 0) { col.unshift(it); idx = 0; persist(); } else note('Sudah ada di koleksi, memutar ulang.');
+    draw(); play(idx); note('Memutar… Jika tidak mulai otomatis, tekan tombol play.'); meta(col[idx]).then(function (m) { persist(); draw(); if (cur === idx) $('#hnow').textContent = (m.title || '') + (m.by ? ' · ' + m.by : ''); });
+  }
+  $('#hf').addEventListener('submit', function (e) { e.preventDefault(); var raw = $('#hl').value; add(raw); $('#hl').value = ''; });
+  $('#hpaste').addEventListener('click', function () { if (!navigator.clipboard || !navigator.clipboard.readText) { note('Browser tidak mengizinkan membaca clipboard. Tempel manual (Ctrl+V).', true); return; } navigator.clipboard.readText().then(function (t) { $('#hl').value = t; add(t); $('#hl').value = ''; }, function () { note('Izin clipboard ditolak. Tempel manual (Ctrl+V).', true); }); });
+  $('#hc').addEventListener('click', function (e) { var b = e.target.closest('button'); if (!b) return; if (b.dataset.p) { play(+b.dataset.p); $('#he').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } if (b.dataset.d) { var i = +b.dataset.d; col.splice(i, 1); if (i === cur) { stopExt(); cur = -1; } else if (i < cur) cur--; persist(); draw(); } });
+  $('#hplay').addEventListener('click', function () { try { if (yt && yt.getPlayerState) { yt.getPlayerState() === 1 ? yt.pauseVideo() : yt.playVideo(); } else if (sp && sp.togglePlay) sp.togglePlay(); } catch (e) { } });
+  $('#hnext').addEventListener('click', next); $('#hprev').addEventListener('click', prev);
+  $('#hseek').addEventListener('input', function () { try { if (yt && yt.seekTo) yt.seekTo(yt.getDuration() * this.value / 1000, true); else if (sp && sp.seek) { /* durasi dari update terakhir */ var d = parseFloat($('#hdur').dataset.s || 0); } } catch (e) { } });
+  $('#hvol').addEventListener('input', function () { try { if (yt && yt.setVolume) yt.setVolume(+this.value); } catch (e) { } });
+  ['play', 'next', 'prev'].forEach(function (id) { var b = document.getElementById(id); if (b) b.addEventListener('click', window.__extStop, true); });
+  document.addEventListener('click', function (e) { if (e.target.closest('.cover,.tr')) window.__extStop(); }, true);
+  function links() { var q = encodeURIComponent($('#hs').value.trim()); $('#hsp').href = q ? 'https://open.spotify.com/search/' + q : 'https://open.spotify.com/search'; $('#hyt').href = q ? 'https://music.youtube.com/search?q=' + q : 'https://music.youtube.com/'; }
+  $('#hs').addEventListener('input', links); links(); draw();
+  if (isFile) note('Kamu membuka halaman dari berkas lokal. YouTube/Spotify hanya bisa diputar lewat http(s): jalankan "npx serve ." atau buka versi Vercel.', true);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="night">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Snake Retro | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_shared/shared.css">
+
+</head>
+<body data-title="Snake Retro">
+<main class="app">
+
+<h1>Snake Retro</h1>
+<section class="box" style="text-align:center">
+<p>Skor <b id="sc">0</b> &nbsp; Rekor <b id="bs">0</b> &nbsp; Level <b id="lv">1</b></p>
+<canvas id="c" width="400" height="400" style="width:min(400px,100%);aspect-ratio:1;box-shadow:0 0 0 4px var(--gold)" aria-label="Papan game Snake"></canvas>
+<p class="muted" style="margin-top:14px">Panah atau WASD untuk bergerak, Spasi untuk jeda. Di ponsel, geser layar.</p>
+<button class="btn gold" id="go">Main</button><button class="btn" id="snd" aria-pressed="false">Suara: mati</button><button class="btn" id="wall" aria-pressed="false">Dinding: mematikan</button><button class="btn" id="pz">Jeda</button>
+<div id="pad" style="display:grid;grid-template-columns:repeat(3,56px);gap:6px;justify-content:center;margin-top:14px" aria-label="Tombol arah"><span></span><button class="btn btn-sm" data-d="up" aria-label="Atas">&#9650;</button><span></span><button class="btn btn-sm" data-d="left" aria-label="Kiri">&#9664;</button><button class="btn btn-sm" data-d="down" aria-label="Bawah">&#9660;</button><button class="btn btn-sm" data-d="right" aria-label="Kanan">&#9654;</button></div>
+</section>
+</main>
+<script src="../_shared/shared.js"></script>
+<script>
+
+var c=$('#c'),x=c.getContext('2d'),N=20,S=c.width/N,B=load('jh-snake-best',0),snake,dir,nx,ap,sc,run=false,pause=false,t,snd=false,ac,wrap=load('jh-snake-wrap',false);
+$('#bs').textContent=B;
+function beep(f,d){if(!snd)return;try{ac=ac||new(window.AudioContext||window.webkitAudioContext)();var o=ac.createOscillator(),g=ac.createGain();o.type='square';o.frequency.value=f;g.gain.value=.05;g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+d);o.connect(g);g.connect(ac.destination);o.start();o.stop(ac.currentTime+d)}catch(e){}}
+function spawn(){do{ap={x:Math.random()*N|0,y:Math.random()*N|0}}while(snake.some(function(b){return b.x==ap.x&&b.y==ap.y}))}
+function cell(a,b,col){x.fillStyle=col;x.fillRect(a*S+1,b*S+1,S-2,S-2)}
+function draw(msg){x.fillStyle='#0e1a14';x.fillRect(0,0,c.width,c.height);x.fillStyle='#14281e';for(var i=0;i<N;i++)for(var j=0;j<N;j++)if((i+j)%2)x.fillRect(i*S,j*S,S,S);
+  if(snake){cell(ap.x,ap.y,'#ff5d8f');snake.forEach(function(b,i){cell(b.x,b.y,i?'#5ad66f':'#b8ff8f')})}
+  if(msg){x.fillStyle='#000a';x.fillRect(0,0,c.width,c.height);x.fillStyle='#ffc83d';x.font='18px "Press Start 2P",monospace';x.textAlign='center';x.fillText(msg,c.width/2,c.height/2)}}
+function speed(){return Math.max(55,150-sc*5)}
+function loop(){clearInterval(t);t=setInterval(step,speed())}
+function over(){run=false;clearInterval(t);beep(150,.4);if(sc>B){B=sc;save('jh-snake-best',B);$('#bs').textContent=B}draw('Game over');$('#go').textContent='Main lagi'}
+function step(){if(pause)return;dir=nx;var h={x:snake[0].x+dir.x,y:snake[0].y+dir.y};
+  if(wrap){h.x=(h.x+N)%N;h.y=(h.y+N)%N}
+  if(h.x<0||h.y<0||h.x>=N||h.y>=N||snake.some(function(b){return b.x==h.x&&b.y==h.y}))return over();
+  snake.unshift(h);if(h.x==ap.x&&h.y==ap.y){sc++;$('#sc').textContent=sc;$('#lv').textContent=1+(sc/5|0);beep(900,.1);spawn();loop()}else snake.pop();draw()}
+function start(){snake=[{x:10,y:10},{x:9,y:10},{x:8,y:10}];dir=nx={x:1,y:0};sc=0;pause=false;$('#sc').textContent=0;$('#lv').textContent=1;spawn();run=true;draw();loop();$('#go').textContent='Ulangi'}
+function turn(d){var m={up:[0,-1],down:[0,1],left:[-1,0],right:[1,0]}[d];if(!m||!run)return;if(m[0]==-dir.x&&m[1]==-dir.y)return;nx={x:m[0],y:m[1]}}
+$('#go').onclick=start;
+function setWall(){$('#wall').textContent='Dinding: '+(wrap?'tembus':'mematikan');$('#wall').setAttribute('aria-pressed',wrap)}
+$('#wall').onclick=function(){wrap=!wrap;save('jh-snake-wrap',wrap);setWall()};setWall();
+function togglePause(){if(!run)return;pause=!pause;draw(pause?'Jeda':'');$('#pz').textContent=pause?'Lanjut':'Jeda'}
+$('#pz').onclick=togglePause;
+$('#pad').addEventListener('click',function(e){var b=e.target.closest('[data-d]');if(b)turn(b.dataset.d)});
+$('#snd').onclick=function(){snd=!snd;this.textContent='Suara: '+(snd?'nyala':'mati');this.setAttribute('aria-pressed',snd)};
+document.addEventListener('keydown',function(e){var k={ArrowUp:'up',ArrowDown:'down',ArrowLeft:'left',ArrowRight:'right',w:'up',s:'down',a:'left',d:'right'}[e.key];
+  if(e.key===' '&&run){e.preventDefault();togglePause()}if(k){if(run)e.preventDefault();turn(k)}});
+var sx,sy;c.addEventListener('touchstart',function(e){sx=e.touches[0].clientX;sy=e.touches[0].clientY},{passive:true});
+c.addEventListener('touchend',function(e){var dx=e.changedTouches[0].clientX-sx,dy=e.changedTouches[0].clientY-sy;if(Math.max(Math.abs(dx),Math.abs(dy))<20)return;turn(Math.abs(dx)>Math.abs(dy)?(dx>0?'right':'left'):(dy>0?'down':'up'))},{passive:true});
+draw('Tekan Main');
+</script>
+</body></html>

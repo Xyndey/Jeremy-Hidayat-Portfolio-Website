@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="night">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>E-Kantin Sekolah | Jeremy Hidayat</title>
+<link rel="icon" type="image/svg+xml" href="../../assets/favicon.svg">
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../_shared/shared.css">
+
+</head>
+<body data-title="E-Kantin Sekolah">
+<main class="app">
+
+<h1>E-Kantin Sekolah</h1>
+<div class="row"><button class="btn gold" data-tab="menu">Menu</button><button class="btn" data-tab="orders">Pesanan</button><label class="row muted"><input type="checkbox" id="seller"> Mode penjual</label></div>
+<div class="row" id="searchRow"><input id="sq" type="search" placeholder="Cari menu (contoh: es)" maxlength="30" aria-label="Cari menu"></div>
+<section id="menu" class="row" style="align-items:flex-start;gap:24px">
+  <div class="grid grow" style="flex:2;min-width:280px" id="items"></div>
+  <aside class="box grow" style="min-width:240px"><h2>Keranjang</h2><ul id="cart"></ul><p id="total" class="pf" style="font-size:.7rem"></p>
+    <input id="nm" placeholder="Nama pemesan" maxlength="30" aria-label="Nama pemesan"><input id="nt" placeholder="Catatan (opsional)" maxlength="60" aria-label="Catatan pesanan"><button class="btn btn-sm" id="clrc">Kosongkan keranjang</button><button class="btn gold" id="order">Pesan sekarang</button></aside>
+</section>
+<section id="orders" class="box" hidden><h2>Pesanan</h2><p id="osum" class="muted"></p><ul id="olist"></ul></section>
+</main>
+<script src="../_shared/shared.js"></script>
+<script>
+
+var M=[['Nasi Goreng','🍛',15000],['Mie Ayam','🍜',13000],['Ayam Geprek','🍗',16000],['Roti Bakar','🍞',8000],['Gorengan','🍤',2000],['Es Teh','🧋',4000],['Es Jeruk','🍊',5000],['Air Mineral','💧',3000]];
+var cart={},O=load('jh-kantin',[]);
+function items(){var q=($('#sq').value||'').trim().toLowerCase();$('#items').innerHTML=M.map(function(m,i){if(q&&m[0].toLowerCase().indexOf(q)<0)return '';return '<div class="box" style="margin:4px;text-align:center"><div style="font-size:2.4rem">'+m[1]+'</div><div>'+esc(m[0])+'</div><div class="muted">'+rp(m[2])+'</div><button class="btn btn-sm gold" data-add="'+i+'">Tambah</button></div>'}).join('')||'<p class="muted">Menu tidak ditemukan.</p>'}
+function renderCart(){var t=0,h='';Object.keys(cart).forEach(function(i){var q=cart[i],m=M[i];t+=q*m[2];h+='<li class="row" style="justify-content:space-between"><span>'+esc(m[0])+' x'+q+'</span><span><button class="btn btn-sm" data-add="'+i+'" aria-label="Tambah">+</button> <button class="btn btn-sm" data-dec="'+i+'" aria-label="Kurangi">-</button></span></li>'});
+  $('#cart').innerHTML=h||'<li class="muted">Keranjang kosong.</li>';$('#total').textContent='Total '+rp(t);$('#order').disabled=!t;return t}
+function renderOrders(){var sel=$('#seller').checked;var inc=O.filter(function(o){return o.taken}).reduce(function(a,o){return a+o.total},0);$('#osum').textContent=sel?O.length+' pesanan | Pendapatan (sudah diambil) '+rp(inc):O.length+' pesanan';$('#olist').innerHTML=O.slice().reverse().map(function(o){return '<li class="row" style="justify-content:space-between;padding:10px 0;border-bottom:4px dotted var(--muted)"><div><b>'+esc(o.code)+'</b> &middot; '+esc(o.name)+'<br><span class="muted">'+esc(o.lines)+' &middot; '+rp(o.total)+(o.note?'<br>Catatan: '+esc(o.note):'')+'</span></div><div><span class="chip">'+(o.taken?'Sudah diambil':o.ready?'Siap diambil':'Diproses')+'</span>'+(sel&&!o.ready?' <button class="btn btn-sm gold" data-ready="'+o.code+'">Tandai siap</button>':'')+(sel&&o.ready&&!o.taken?' <button class="btn btn-sm gold" data-taken="'+o.code+'">Tandai diambil</button>':'')+(sel?' <button class="btn btn-sm pink" data-rm="'+o.code+'" aria-label="Hapus pesanan '+esc(o.code)+'">&#10005;</button>':'')+'</div></li>'}).join('')||'<li class="muted">Belum ada pesanan. Pilih menu lalu tekan Pesan sekarang.</li>'}
+document.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+  if(b.dataset.add){cart[b.dataset.add]=(cart[b.dataset.add]||0)+1;renderCart()}
+  if(b.dataset.dec){if(--cart[b.dataset.dec]<=0)delete cart[b.dataset.dec];renderCart()}
+  if(b.dataset.tab){$('#menu').hidden=b.dataset.tab!=='menu';$('#orders').hidden=b.dataset.tab!=='orders';renderOrders()}
+  if(b.dataset.ready){O.forEach(function(o){if(o.code===b.dataset.ready)o.ready=true});save('jh-kantin',O);renderOrders()}
+  if(b.dataset.taken){O.forEach(function(o){if(o.code===b.dataset.taken)o.taken=true});save('jh-kantin',O);renderOrders()}
+  if(b.dataset.rm){O=O.filter(function(o){return o.code!==b.dataset.rm});save('jh-kantin',O);renderOrders()}});
+$('#sq').addEventListener('input',items);
+$('#clrc').addEventListener('click',function(){cart={};renderCart()});
+$('#order').addEventListener('click',function(){var t=renderCart();if(!t)return;var nm=$('#nm').value.trim();if(!nm){toast('Isi nama pemesan dulu');$('#nm').focus();return}
+  var code;do{code='K'+String(Math.floor(Math.random()*900)+100)}while(O.some(function(o){return o.code===code}));var lines=Object.keys(cart).map(function(i){return M[i][0]+' x'+cart[i]}).join(', ');
+  O.push({code:code,name:nm,note:$('#nt').value.trim(),lines:lines,total:t,ready:false,taken:false});$('#nt').value='';save('jh-kantin',O);cart={};renderCart();toast('Pesanan dibuat. Kode: '+code)});
+$('#seller').addEventListener('change',renderOrders);
+items();renderCart();renderOrders();
+</script>
+</body></html>
